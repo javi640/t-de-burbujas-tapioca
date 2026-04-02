@@ -1,0 +1,936 @@
+-- =============================================================================
+-- SISTEMA DE GESTIÓN DE VENTAS Y CONTROL DE CAJA - PANDA NAICHA
+-- Base de Datos Relacional Normalizada (3FN) - PostgreSQL 15+
+-- Arquitectura: Multi-sucursal escalable
+-- Versión: 1.0.0 | Fecha: 2026
+-- =============================================================================
+
+-- =============================================================================
+-- CONFIGURACIÓN INICIAL
+-- =============================================================================
+
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";     -- Para funciones criptográficas
+CREATE EXTENSION IF NOT EXISTS "pg_trgm";      -- Para búsquedas de texto parcial
+
+-- =============================================================================
+-- SECCIÓN 1: TABLAS DE CATÁLOGO Y CONFIGURACIÓN
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- 1.1 SUCURSALES
+-- Permite escalabilidad multi-sucursal futura sin rediseñar el esquema.
+-- -----------------------------------------------------------------------------
+CREATE TABLE sucursales (
+    sucursal_id     SERIAL          PRIMARY KEY,
+    nombre          VARCHAR(100)    NOT NULL,
+    direccion       TEXT,
+    ciudad          VARCHAR(100),
+    telefono        VARCHAR(20),
+    activa          BOOLEAN         NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE sucursales IS 'Registro de sucursales del negocio. Preparado para multi-sede.';
+
+
+-- -----------------------------------------------------------------------------
+-- 1.2 ROLES
+-- Catálogo de roles del sistema: ADMINISTRADOR y CAJERO.
+-- Se normaliza en tabla propia (no en ENUM) para permitir extensión futura.
+-- -----------------------------------------------------------------------------
+CREATE TABLE roles (
+    rol_id          SERIAL          PRIMARY KEY,
+    nombre          VARCHAR(50)     NOT NULL UNIQUE,  -- 'ADMINISTRADOR', 'CAJERO'
+    descripcion     TEXT,
+    created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE roles IS 'Catálogo de roles de acceso al sistema.';
+
+-- Datos semilla obligatorios
+INSERT INTO roles (nombre, descripcion) VALUES
+    ('ADMINISTRADOR', 'Acceso total al sistema: usuarios, reportes, configuración y auditoría'),
+    ('CAJERO',        'Acceso operativo: apertura/cierre de turno, ventas, egresos e ingresos');
+
+
+-- -----------------------------------------------------------------------------
+-- 1.3 MÉTODOS DE PAGO
+-- Catálogo normalizado de métodos de pago aceptados.
+-- -----------------------------------------------------------------------------
+CREATE TABLE metodos_pago (
+    metodo_pago_id  SERIAL          PRIMARY KEY,
+    nombre          VARCHAR(50)     NOT NULL UNIQUE,  -- 'EFECTIVO', 'QR'
+    descripcion     TEXT,
+    activo          BOOLEAN         NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE metodos_pago IS 'Catálogo de métodos de pago aceptados en el punto de venta.';
+
+-- Datos semilla obligatorios
+INSERT INTO metodos_pago (nombre, descripcion) VALUES
+    ('EFECTIVO', 'Pago en moneda física (bolivianos)'),
+    ('QR',       'Pago mediante código QR (transferencia digital)');
+
+
+-- -----------------------------------------------------------------------------
+-- 1.4 CATEGORÍAS DE PRODUCTO
+-- Clasificación de los productos finales en venta.
+-- -----------------------------------------------------------------------------
+CREATE TABLE categorias_producto (
+    categoria_id    SERIAL          PRIMARY KEY,
+    nombre          VARCHAR(100)    NOT NULL UNIQUE,
+    descripcion     TEXT,
+    activa          BOOLEAN         NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE categorias_producto IS 'Clasificación de productos finales (ej: Bebidas, Tés, Postres).';
+
+
+-- -----------------------------------------------------------------------------
+-- 1.5 CATEGORÍAS DE EGRESO
+-- Clasificación de los egresos de caja para auditoría y reportes.
+-- -----------------------------------------------------------------------------
+CREATE TABLE categorias_egreso (
+    categoria_egreso_id SERIAL      PRIMARY KEY,
+    nombre              VARCHAR(100) NOT NULL UNIQUE,
+    descripcion         TEXT,
+    activa              BOOLEAN      NOT NULL DEFAULT TRUE,
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE categorias_egreso IS 'Clasificación de egresos: insumos, servicios, limpieza, etc.';
+
+-- Datos semilla sugeridos
+INSERT INTO categorias_egreso (nombre, descripcion) VALUES
+    ('INSUMOS',           'Compra de insumos o materia prima urgente'),
+    ('SERVICIOS',         'Pago de servicios: agua, luz, internet'),
+    ('MANTENIMIENTO',     'Reparaciones o mantenimiento del local'),
+    ('LOGISTICA',         'Gastos de transporte o delivery'),
+    ('OTROS',             'Egresos no clasificados en otras categorías');
+
+
+-- =============================================================================
+-- SECCIÓN 2: TABLAS DE USUARIOS Y AUTENTICACIÓN
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- 2.1 USUARIOS
+-- Tabla central de usuarios. Soporta administradores globales y cajeros
+-- por sucursal. Diseñada para no eliminar registros (baja lógica).
+-- -----------------------------------------------------------------------------
+CREATE TABLE usuarios (
+    usuario_id          SERIAL          PRIMARY KEY,
+    sucursal_id         INTEGER         REFERENCES sucursales(sucursal_id) ON DELETE RESTRICT,
+    rol_id              INTEGER         NOT NULL REFERENCES roles(rol_id) ON DELETE RESTRICT,
+    nombre              VARCHAR(100)    NOT NULL,
+    apellido            VARCHAR(100)    NOT NULL,
+    email               VARCHAR(150)    NOT NULL UNIQUE,
+    username            VARCHAR(50)     NOT NULL UNIQUE,
+    password_hash       VARCHAR(255)    NOT NULL,
+    activo              BOOLEAN         NOT NULL DEFAULT TRUE,
+    ultimo_acceso       TIMESTAMPTZ,
+    intentos_fallidos   SMALLINT        NOT NULL DEFAULT 0 CHECK (intentos_fallidos >= 0),
+    bloqueado           BOOLEAN         NOT NULL DEFAULT FALSE,
+    reset_token_hash    VARCHAR(255),               -- HU19: restablecimiento de contraseña
+    reset_token_expira  TIMESTAMPTZ,
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE usuarios IS 'Usuarios del sistema. Nunca se eliminan (baja lógica con activo=FALSE).';
+COMMENT ON COLUMN usuarios.sucursal_id IS 'NULL = usuario global (administrador sin restricción de sede).';
+COMMENT ON COLUMN usuarios.password_hash IS 'Hash bcrypt. Nunca almacenar contraseña en texto plano.';
+
+
+-- -----------------------------------------------------------------------------
+-- 2.2 SESIONES DE ACCESO
+-- Registro auditado de cada inicio de sesión (HU01, HU02).
+-- Permite invalidación de sesiones y detección de accesos anómalos.
+-- -----------------------------------------------------------------------------
+CREATE TABLE sesiones (
+    sesion_id           SERIAL          PRIMARY KEY,
+    usuario_id          INTEGER         NOT NULL REFERENCES usuarios(usuario_id) ON DELETE CASCADE,
+    token_hash          VARCHAR(255)    NOT NULL UNIQUE,
+    ip_address          INET,
+    user_agent          TEXT,
+    fecha_inicio        TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    fecha_expiracion    TIMESTAMPTZ     NOT NULL,
+    activa              BOOLEAN         NOT NULL DEFAULT TRUE,
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE sesiones IS 'Registro de sesiones activas para autenticación JWT con revocación.';
+
+
+-- =============================================================================
+-- SECCIÓN 3: CATÁLOGO DE PRODUCTOS
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- 3.1 PRODUCTOS
+-- Catálogo de productos finales en venta. NO insumos.
+-- Precio almacenado aquí es el precio vigente; en detalle_ventas se guarda
+-- el precio histórico para integridad de reportes pasados.
+-- -----------------------------------------------------------------------------
+CREATE TABLE productos (
+    producto_id         SERIAL          PRIMARY KEY,
+    categoria_id        INTEGER         NOT NULL REFERENCES categorias_producto(categoria_id) ON DELETE RESTRICT,
+    sucursal_id         INTEGER         REFERENCES sucursales(sucursal_id) ON DELETE RESTRICT,
+    nombre              VARCHAR(150)    NOT NULL,
+    descripcion         TEXT,
+    precio_unitario     NUMERIC(10,2)   NOT NULL CHECK (precio_unitario >= 0),
+    activo              BOOLEAN         NOT NULL DEFAULT TRUE,
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE productos IS 'Catálogo de productos finales. sucursal_id=NULL = producto disponible en todas las sedes.';
+COMMENT ON COLUMN productos.precio_unitario IS 'Precio vigente actual. El histórico se preserva en detalle_ventas.';
+
+
+-- =============================================================================
+-- SECCIÓN 4: TURNOS Y CONTROL DE CAJA
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- 4.1 TURNOS
+-- Núcleo del control operativo. Cada cajero abre y cierra su turno.
+-- Toda la trazabilidad financiera se ancla al turno_id.
+-- -----------------------------------------------------------------------------
+CREATE TABLE turnos (
+    turno_id            SERIAL          PRIMARY KEY,
+    sucursal_id         INTEGER         NOT NULL REFERENCES sucursales(sucursal_id) ON DELETE RESTRICT,
+    usuario_id          INTEGER         NOT NULL REFERENCES usuarios(usuario_id) ON DELETE RESTRICT,
+    numero_turno        VARCHAR(30)     NOT NULL UNIQUE,  -- ej: 'T-20260101-001'
+    estado              VARCHAR(20)     NOT NULL DEFAULT 'ABIERTO'
+                            CHECK (estado IN ('ABIERTO', 'CERRADO')),
+    monto_apertura      NUMERIC(10,2)   NOT NULL DEFAULT 0.00 CHECK (monto_apertura >= 0),
+    observaciones_apertura TEXT,
+    fecha_apertura      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    fecha_cierre        TIMESTAMPTZ,
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+
+    -- Garantiza que el cajero no pueda tener dos turnos abiertos al mismo tiempo
+    CONSTRAINT uq_turno_usuario_abierto EXCLUDE USING btree
+        (usuario_id WITH =) WHERE (estado = 'ABIERTO')
+);
+
+COMMENT ON TABLE turnos IS 'Turnos de trabajo de cajeros. Toda la actividad financiera se referencia aquí.';
+COMMENT ON COLUMN turnos.monto_apertura IS 'Efectivo físico en caja al abrir el turno (stock inicial en dinero).';
+
+
+-- -----------------------------------------------------------------------------
+-- 4.2 STOCK INICIAL DE PRODUCTOS POR TURNO
+-- Registro de unidades de cada producto al inicio del turno (HU04, HU20).
+-- Permite conciliación stock vs. ventas al cierre.
+-- -----------------------------------------------------------------------------
+CREATE TABLE stock_inicial_turno (
+    stock_inicial_id        SERIAL      PRIMARY KEY,
+    turno_id                INTEGER     NOT NULL REFERENCES turnos(turno_id) ON DELETE RESTRICT,
+    producto_id             INTEGER     NOT NULL REFERENCES productos(producto_id) ON DELETE RESTRICT,
+    cantidad_inicial        INTEGER     NOT NULL DEFAULT 0 CHECK (cantidad_inicial >= 0),
+    precio_unitario_apertura NUMERIC(10,2) NOT NULL CHECK (precio_unitario_apertura >= 0),
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT uq_stock_turno_producto UNIQUE (turno_id, producto_id)
+);
+
+COMMENT ON TABLE stock_inicial_turno IS 'Snapshot de unidades disponibles por producto al inicio del turno.';
+
+
+-- =============================================================================
+-- SECCIÓN 5: VENTAS
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- 5.1 VENTAS (CABECERA)
+-- Encabezado de cada transacción de venta. Soporta anulación con auditoría.
+-- El total se almacena para eficiencia de reportes (denormalización controlada).
+-- -----------------------------------------------------------------------------
+CREATE TABLE ventas (
+    venta_id            SERIAL          PRIMARY KEY,
+    turno_id            INTEGER         NOT NULL REFERENCES turnos(turno_id) ON DELETE RESTRICT,
+    usuario_id          INTEGER         NOT NULL REFERENCES usuarios(usuario_id) ON DELETE RESTRICT,
+    numero_venta        VARCHAR(30)     NOT NULL UNIQUE,  -- ej: 'V-20260101-0001'
+    total               NUMERIC(10,2)   NOT NULL CHECK (total >= 0),
+    estado              VARCHAR(20)     NOT NULL DEFAULT 'COMPLETADA'
+                            CHECK (estado IN ('COMPLETADA', 'ANULADA')),
+    anulado_por         INTEGER         REFERENCES usuarios(usuario_id),
+    motivo_anulacion    TEXT,
+    fecha_anulacion     TIMESTAMPTZ,
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT chk_anulacion_coherente
+        CHECK (
+            (estado = 'ANULADA' AND anulado_por IS NOT NULL AND motivo_anulacion IS NOT NULL)
+            OR (estado = 'COMPLETADA' AND anulado_por IS NULL)
+        )
+);
+
+COMMENT ON TABLE ventas IS 'Cabecera de ventas. Las ventas nunca se eliminan, solo se anulan.';
+
+
+-- -----------------------------------------------------------------------------
+-- 5.2 DETALLE DE VENTAS (LÍNEAS)
+-- Cada producto incluido en una venta. Almacena precio histórico (snapshot)
+-- para garantizar integridad de reportes aunque cambie el precio del producto.
+-- Cumple 3FN: precio_unitario NO depende de la PK de ventas, sino del
+-- momento histórico de la transacción.
+-- -----------------------------------------------------------------------------
+CREATE TABLE detalle_ventas (
+    detalle_id          SERIAL          PRIMARY KEY,
+    venta_id            INTEGER         NOT NULL REFERENCES ventas(venta_id) ON DELETE RESTRICT,
+    producto_id         INTEGER         NOT NULL REFERENCES productos(producto_id) ON DELETE RESTRICT,
+    cantidad            INTEGER         NOT NULL CHECK (cantidad > 0),
+    precio_unitario     NUMERIC(10,2)   NOT NULL CHECK (precio_unitario >= 0),  -- snapshot histórico
+    subtotal            NUMERIC(10,2)   NOT NULL CHECK (subtotal >= 0),          -- cantidad * precio_unitario
+
+    CONSTRAINT uq_detalle_venta_producto UNIQUE (venta_id, producto_id),
+    CONSTRAINT chk_subtotal_correcto
+        CHECK (subtotal = cantidad * precio_unitario)
+);
+
+COMMENT ON TABLE detalle_ventas IS 'Líneas de venta. precio_unitario es snapshot histórico inmutable.';
+
+
+-- -----------------------------------------------------------------------------
+-- 5.3 PAGOS DE VENTA
+-- Permite split payments (pago mixto Efectivo + QR).
+-- Normalizado en tabla propia para soportar múltiples métodos por venta.
+-- -----------------------------------------------------------------------------
+CREATE TABLE pagos_venta (
+    pago_id             SERIAL          PRIMARY KEY,
+    venta_id            INTEGER         NOT NULL REFERENCES ventas(venta_id) ON DELETE RESTRICT,
+    metodo_pago_id      INTEGER         NOT NULL REFERENCES metodos_pago(metodo_pago_id) ON DELETE RESTRICT,
+    monto               NUMERIC(10,2)   NOT NULL CHECK (monto > 0),
+    referencia_externa  VARCHAR(150),   -- Código de comprobante QR o referencia bancaria
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE pagos_venta IS 'Pagos asociados a una venta. Permite pagos mixtos (split payment).';
+
+
+-- =============================================================================
+-- SECCIÓN 6: MOVIMIENTOS FINANCIEROS (EGRESOS E INGRESOS EXTRA)
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- 6.1 EGRESOS DE CAJA
+-- Salidas de dinero no relacionadas con ventas (HU08).
+-- Auditados por turno y usuario, con categorización.
+-- -----------------------------------------------------------------------------
+CREATE TABLE egresos (
+    egreso_id               SERIAL          PRIMARY KEY,
+    turno_id                INTEGER         NOT NULL REFERENCES turnos(turno_id) ON DELETE RESTRICT,
+    usuario_id              INTEGER         NOT NULL REFERENCES usuarios(usuario_id) ON DELETE RESTRICT,
+    categoria_egreso_id     INTEGER         NOT NULL REFERENCES categorias_egreso(categoria_egreso_id) ON DELETE RESTRICT,
+    metodo_pago_id          INTEGER         NOT NULL REFERENCES metodos_pago(metodo_pago_id) ON DELETE RESTRICT,
+    descripcion             TEXT            NOT NULL,
+    monto                   NUMERIC(10,2)   NOT NULL CHECK (monto > 0),
+    comprobante_referencia  VARCHAR(150),   -- Número de factura o referencia del gasto
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE egresos IS 'Salidas de efectivo en turno: compras de emergencia, servicios, etc.';
+
+
+-- -----------------------------------------------------------------------------
+-- 6.2 INGRESOS EXTRAORDINARIOS
+-- Entradas de dinero distintas a ventas normales (HU09).
+-- Ejemplos: préstamos del dueño, devoluciones de proveedores.
+-- -----------------------------------------------------------------------------
+CREATE TABLE ingresos_extraordinarios (
+    ingreso_id          SERIAL          PRIMARY KEY,
+    turno_id            INTEGER         NOT NULL REFERENCES turnos(turno_id) ON DELETE RESTRICT,
+    usuario_id          INTEGER         NOT NULL REFERENCES usuarios(usuario_id) ON DELETE RESTRICT,
+    metodo_pago_id      INTEGER         NOT NULL REFERENCES metodos_pago(metodo_pago_id) ON DELETE RESTRICT,
+    descripcion         TEXT            NOT NULL,
+    monto               NUMERIC(10,2)   NOT NULL CHECK (monto > 0),
+    referencia          VARCHAR(150),
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE ingresos_extraordinarios IS 'Ingresos no generados por ventas directas durante el turno.';
+
+
+-- =============================================================================
+-- SECCIÓN 7: CIERRE DE TURNO Y CONCILIACIÓN
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- 7.1 CIERRE DE TURNO
+-- Registro del arqueo de caja al cerrar el turno (HU10, HU12).
+-- Captura el estado financiero final calculado vs. declarado.
+-- -----------------------------------------------------------------------------
+CREATE TABLE cierre_turno (
+    cierre_id                   SERIAL          PRIMARY KEY,
+    turno_id                    INTEGER         NOT NULL UNIQUE REFERENCES turnos(turno_id) ON DELETE RESTRICT,
+    usuario_cierre_id           INTEGER         NOT NULL REFERENCES usuarios(usuario_id) ON DELETE RESTRICT,
+
+    -- Totales calculados por el sistema
+    monto_apertura              NUMERIC(10,2)   NOT NULL DEFAULT 0.00,
+    total_ventas_efectivo       NUMERIC(10,2)   NOT NULL DEFAULT 0.00,
+    total_ventas_qr             NUMERIC(10,2)   NOT NULL DEFAULT 0.00,
+    total_ventas                NUMERIC(10,2)   NOT NULL DEFAULT 0.00,
+    total_ingresos_extra        NUMERIC(10,2)   NOT NULL DEFAULT 0.00,
+    total_egresos               NUMERIC(10,2)   NOT NULL DEFAULT 0.00,
+
+    -- Monto esperado vs. monto real contado físicamente
+    monto_esperado_efectivo     NUMERIC(10,2)   NOT NULL,  -- Calculado: apertura + ventas_efectivo + ingresos_extra_efectivo - egresos_efectivo
+    monto_real_efectivo         NUMERIC(10,2)   NOT NULL,  -- Declarado por cajero al contar físicamente
+    diferencia_efectivo         NUMERIC(10,2)   GENERATED ALWAYS AS (monto_real_efectivo - monto_esperado_efectivo) STORED,
+
+    estado_conciliacion         VARCHAR(20)     NOT NULL
+                                    CHECK (estado_conciliacion IN ('CUADRADO', 'FALTANTE', 'SOBRANTE')),
+    observaciones               TEXT,
+    fecha_cierre                TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    created_at                  TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE cierre_turno IS 'Arqueo y conciliación al cierre del turno. Columna diferencia_efectivo es calculada (GENERATED).';
+
+
+-- -----------------------------------------------------------------------------
+-- 7.2 CONCILIACIÓN POR MÉTODO DE PAGO
+-- Detalle de conciliación para cada método de pago al cierre (HU15).
+-- Normalizado fuera de cierre_turno para permitir N métodos de pago.
+-- -----------------------------------------------------------------------------
+CREATE TABLE conciliacion_metodo_pago (
+    conciliacion_id     SERIAL          PRIMARY KEY,
+    cierre_id           INTEGER         NOT NULL REFERENCES cierre_turno(cierre_id) ON DELETE RESTRICT,
+    metodo_pago_id      INTEGER         NOT NULL REFERENCES metodos_pago(metodo_pago_id) ON DELETE RESTRICT,
+    monto_calculado     NUMERIC(10,2)   NOT NULL DEFAULT 0.00,  -- Suma del sistema
+    monto_declarado     NUMERIC(10,2)   NOT NULL DEFAULT 0.00,  -- Conteo físico/verificado
+    diferencia          NUMERIC(10,2)   GENERATED ALWAYS AS (monto_declarado - monto_calculado) STORED,
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT uq_conciliacion_cierre_metodo UNIQUE (cierre_id, metodo_pago_id)
+);
+
+COMMENT ON TABLE conciliacion_metodo_pago IS 'Conciliación detallada por método de pago al cierre del turno (HU15).';
+
+
+-- =============================================================================
+-- SECCIÓN 8: TRAZABILIDAD Y AUDITORÍA FINANCIERA
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- 8.1 MOVIMIENTOS DE CAJA (LIBRO MAYOR OPERATIVO)
+-- Registro cronológico e inmutable de todos los movimientos financieros
+-- durante un turno. Es el "libro de caja" digital. Referencia polimórfica
+-- hacia ventas, egresos o ingresos_extraordinarios según tipo_movimiento.
+-- -----------------------------------------------------------------------------
+CREATE TABLE movimientos_caja (
+    movimiento_id       SERIAL          PRIMARY KEY,
+    turno_id            INTEGER         NOT NULL REFERENCES turnos(turno_id) ON DELETE RESTRICT,
+    usuario_id          INTEGER         NOT NULL REFERENCES usuarios(usuario_id) ON DELETE RESTRICT,
+    metodo_pago_id      INTEGER         REFERENCES metodos_pago(metodo_pago_id),
+    tipo_movimiento     VARCHAR(30)     NOT NULL
+                            CHECK (tipo_movimiento IN ('APERTURA', 'VENTA', 'EGRESO', 'INGRESO_EXTRA', 'CIERRE')),
+    referencia_id       INTEGER,        -- ID del registro fuente (venta_id, egreso_id, etc.)
+    referencia_tabla    VARCHAR(50),    -- Nombre de la tabla fuente
+    monto               NUMERIC(10,2)   NOT NULL,   -- Positivo = ingreso, Negativo = egreso
+    saldo_acumulado     NUMERIC(10,2)   NOT NULL,   -- Saldo running al momento del movimiento
+    descripcion         TEXT,
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE movimientos_caja IS 'Libro de caja operativo. Registro inmutable cronológico de todos los flujos financieros del turno.';
+
+
+-- -----------------------------------------------------------------------------
+-- 8.2 AUDITORÍA DEL SISTEMA (LOG DE CAMBIOS)
+-- Registra operaciones INSERT, UPDATE y DELETE en tablas críticas.
+-- Implementado en triggers para trazabilidad completa (HU16).
+-- -----------------------------------------------------------------------------
+CREATE TABLE auditoria (
+    auditoria_id        BIGSERIAL       PRIMARY KEY,
+    usuario_id          INTEGER         REFERENCES usuarios(usuario_id),  -- NULL si es operación de sistema
+    tabla_afectada      VARCHAR(100)    NOT NULL,
+    operacion           VARCHAR(10)     NOT NULL CHECK (operacion IN ('INSERT', 'UPDATE', 'DELETE')),
+    registro_id         INTEGER,
+    datos_anteriores    JSONB,          -- Estado BEFORE del registro
+    datos_nuevos        JSONB,          -- Estado AFTER del registro
+    ip_address          INET,
+    descripcion         TEXT,
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE auditoria IS 'Log de auditoría inmutable. Registra todos los cambios en tablas críticas del sistema.';
+
+
+-- =============================================================================
+-- SECCIÓN 9: ÍNDICES PARA RENDIMIENTO
+-- =============================================================================
+
+-- Usuarios
+CREATE INDEX idx_usuarios_rol          ON usuarios(rol_id);
+CREATE INDEX idx_usuarios_sucursal     ON usuarios(sucursal_id);
+CREATE INDEX idx_usuarios_username     ON usuarios(username);
+CREATE INDEX idx_usuarios_email        ON usuarios(email);
+CREATE INDEX idx_usuarios_activo       ON usuarios(activo) WHERE activo = TRUE;
+
+-- Sesiones
+CREATE INDEX idx_sesiones_usuario      ON sesiones(usuario_id);
+CREATE INDEX idx_sesiones_token        ON sesiones(token_hash);
+CREATE INDEX idx_sesiones_activas      ON sesiones(activa, fecha_expiracion) WHERE activa = TRUE;
+
+-- Productos
+CREATE INDEX idx_productos_categoria   ON productos(categoria_id);
+CREATE INDEX idx_productos_activos     ON productos(activo) WHERE activo = TRUE;
+CREATE INDEX idx_productos_nombre_trgm ON productos USING GIN (nombre gin_trgm_ops);
+
+-- Turnos
+CREATE INDEX idx_turnos_usuario        ON turnos(usuario_id);
+CREATE INDEX idx_turnos_sucursal       ON turnos(sucursal_id);
+CREATE INDEX idx_turnos_estado         ON turnos(estado);
+CREATE INDEX idx_turnos_fecha          ON turnos(fecha_apertura DESC);
+
+-- Stock inicial
+CREATE INDEX idx_stock_turno           ON stock_inicial_turno(turno_id);
+CREATE INDEX idx_stock_producto        ON stock_inicial_turno(producto_id);
+
+-- Ventas
+CREATE INDEX idx_ventas_turno          ON ventas(turno_id);
+CREATE INDEX idx_ventas_usuario        ON ventas(usuario_id);
+CREATE INDEX idx_ventas_estado         ON ventas(estado);
+CREATE INDEX idx_ventas_fecha          ON ventas(created_at DESC);
+CREATE INDEX idx_ventas_numero         ON ventas(numero_venta);
+
+-- Detalle ventas
+CREATE INDEX idx_detalle_venta         ON detalle_ventas(venta_id);
+CREATE INDEX idx_detalle_producto      ON detalle_ventas(producto_id);
+
+-- Pagos
+CREATE INDEX idx_pagos_venta           ON pagos_venta(venta_id);
+CREATE INDEX idx_pagos_metodo          ON pagos_venta(metodo_pago_id);
+
+-- Egresos
+CREATE INDEX idx_egresos_turno         ON egresos(turno_id);
+CREATE INDEX idx_egresos_categoria     ON egresos(categoria_egreso_id);
+CREATE INDEX idx_egresos_fecha         ON egresos(created_at DESC);
+
+-- Ingresos extraordinarios
+CREATE INDEX idx_ingresos_turno        ON ingresos_extraordinarios(turno_id);
+
+-- Movimientos de caja
+CREATE INDEX idx_movimientos_turno     ON movimientos_caja(turno_id);
+CREATE INDEX idx_movimientos_tipo      ON movimientos_caja(tipo_movimiento);
+CREATE INDEX idx_movimientos_fecha     ON movimientos_caja(created_at DESC);
+
+-- Auditoría
+CREATE INDEX idx_auditoria_tabla       ON auditoria(tabla_afectada, registro_id);
+CREATE INDEX idx_auditoria_usuario     ON auditoria(usuario_id);
+CREATE INDEX idx_auditoria_fecha       ON auditoria(created_at DESC);
+CREATE INDEX idx_auditoria_operacion   ON auditoria(operacion);
+
+
+-- =============================================================================
+-- SECCIÓN 10: FUNCIONES Y TRIGGERS
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- 10.1 FUNCIÓN: Actualización automática de updated_at
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION fn_set_updated_at()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$;
+
+-- Aplicar trigger a todas las tablas con updated_at
+CREATE TRIGGER trg_sucursales_updated_at   BEFORE UPDATE ON sucursales   FOR EACH ROW EXECUTE FUNCTION fn_set_updated_at();
+CREATE TRIGGER trg_usuarios_updated_at     BEFORE UPDATE ON usuarios     FOR EACH ROW EXECUTE FUNCTION fn_set_updated_at();
+CREATE TRIGGER trg_productos_updated_at    BEFORE UPDATE ON productos    FOR EACH ROW EXECUTE FUNCTION fn_set_updated_at();
+CREATE TRIGGER trg_turnos_updated_at       BEFORE UPDATE ON turnos       FOR EACH ROW EXECUTE FUNCTION fn_set_updated_at();
+CREATE TRIGGER trg_ventas_updated_at       BEFORE UPDATE ON ventas       FOR EACH ROW EXECUTE FUNCTION fn_set_updated_at();
+CREATE TRIGGER trg_egresos_updated_at      BEFORE UPDATE ON egresos      FOR EACH ROW EXECUTE FUNCTION fn_set_updated_at();
+
+
+-- -----------------------------------------------------------------------------
+-- 10.2 FUNCIÓN: Generación automática de número de turno
+-- Formato: T-YYYYMMDD-NNN (ej: T-20260101-001)
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION fn_generar_numero_turno()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE
+    v_fecha     TEXT;
+    v_secuencia INTEGER;
+BEGIN
+    v_fecha := TO_CHAR(NOW(), 'YYYYMMDD');
+    SELECT COUNT(*) + 1 INTO v_secuencia
+    FROM turnos
+    WHERE TO_CHAR(fecha_apertura, 'YYYYMMDD') = v_fecha
+      AND sucursal_id = NEW.sucursal_id;
+
+    NEW.numero_turno := 'T-' || v_fecha || '-' || LPAD(v_secuencia::TEXT, 3, '0');
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_turnos_numero
+    BEFORE INSERT ON turnos
+    FOR EACH ROW EXECUTE FUNCTION fn_generar_numero_turno();
+
+
+-- -----------------------------------------------------------------------------
+-- 10.3 FUNCIÓN: Generación automática de número de venta
+-- Formato: V-YYYYMMDD-NNNN (ej: V-20260101-0001)
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION fn_generar_numero_venta()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE
+    v_fecha     TEXT;
+    v_secuencia INTEGER;
+BEGIN
+    v_fecha := TO_CHAR(NOW(), 'YYYYMMDD');
+    SELECT COUNT(*) + 1 INTO v_secuencia
+    FROM ventas
+    WHERE TO_CHAR(created_at, 'YYYYMMDD') = v_fecha;
+
+    NEW.numero_venta := 'V-' || v_fecha || '-' || LPAD(v_secuencia::TEXT, 4, '0');
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_ventas_numero
+    BEFORE INSERT ON ventas
+    FOR EACH ROW WHEN (NEW.numero_venta IS NULL OR NEW.numero_venta = '')
+    EXECUTE FUNCTION fn_generar_numero_venta();
+
+
+-- -----------------------------------------------------------------------------
+-- 10.4 FUNCIÓN: Registro automático en movimientos_caja post-venta
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION fn_registrar_movimiento_venta()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE
+    v_saldo     NUMERIC(10,2);
+    v_pago      RECORD;
+BEGIN
+    IF TG_OP = 'INSERT' AND NEW.estado = 'COMPLETADA' THEN
+        FOR v_pago IN
+            SELECT pv.monto, pv.metodo_pago_id
+            FROM pagos_venta pv
+            WHERE pv.venta_id = NEW.venta_id
+        LOOP
+            SELECT COALESCE(MAX(saldo_acumulado), 0) INTO v_saldo
+            FROM movimientos_caja WHERE turno_id = NEW.turno_id;
+
+            INSERT INTO movimientos_caja
+                (turno_id, usuario_id, metodo_pago_id, tipo_movimiento,
+                 referencia_id, referencia_tabla, monto, saldo_acumulado, descripcion)
+            VALUES
+                (NEW.turno_id, NEW.usuario_id, v_pago.metodo_pago_id, 'VENTA',
+                 NEW.venta_id, 'ventas', v_pago.monto, v_saldo + v_pago.monto,
+                 'Venta ' || NEW.numero_venta);
+        END LOOP;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+-- (Este trigger se activa después de que pagos_venta se haya insertado)
+-- Se recomienda invocar desde capa de aplicación para garantizar atomicidad
+
+
+-- -----------------------------------------------------------------------------
+-- 10.5 FUNCIÓN: Trigger de auditoría genérico
+-- Registra INSERT/UPDATE/DELETE en tabla auditoria para tablas críticas.
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION fn_auditoria()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        INSERT INTO auditoria (tabla_afectada, operacion, registro_id, datos_anteriores, datos_nuevos)
+        VALUES (TG_TABLE_NAME, TG_OP, OLD.id, row_to_json(OLD)::jsonb, NULL);
+        RETURN OLD;
+    ELSIF TG_OP = 'UPDATE' THEN
+        INSERT INTO auditoria (tabla_afectada, operacion, registro_id, datos_anteriores, datos_nuevos)
+        VALUES (TG_TABLE_NAME, TG_OP, NEW.id, row_to_json(OLD)::jsonb, row_to_json(NEW)::jsonb);
+        RETURN NEW;
+    ELSIF TG_OP = 'INSERT' THEN
+        INSERT INTO auditoria (tabla_afectada, operacion, registro_id, datos_anteriores, datos_nuevos)
+        VALUES (TG_TABLE_NAME, TG_OP, NEW.id, NULL, row_to_json(NEW)::jsonb);
+        RETURN NEW;
+    END IF;
+END;
+$$;
+
+-- Aplicar auditoría a tablas financieras críticas
+CREATE TRIGGER trg_audit_ventas
+    AFTER INSERT OR UPDATE OR DELETE ON ventas
+    FOR EACH ROW EXECUTE FUNCTION fn_auditoria();
+
+CREATE TRIGGER trg_audit_egresos
+    AFTER INSERT OR UPDATE OR DELETE ON egresos
+    FOR EACH ROW EXECUTE FUNCTION fn_auditoria();
+
+CREATE TRIGGER trg_audit_turnos
+    AFTER INSERT OR UPDATE OR DELETE ON turnos
+    FOR EACH ROW EXECUTE FUNCTION fn_auditoria();
+
+CREATE TRIGGER trg_audit_usuarios
+    AFTER INSERT OR UPDATE OR DELETE ON usuarios
+    FOR EACH ROW EXECUTE FUNCTION fn_auditoria();
+
+
+-- =============================================================================
+-- SECCIÓN 11: VISTAS PARA REPORTES Y DASHBOARD
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- 11.1 VISTA: Resumen de turno activo (HU14 - Dashboard tiempo real)
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_resumen_turno_activo AS
+SELECT
+    t.turno_id,
+    t.numero_turno,
+    t.sucursal_id,
+    s.nombre                                            AS sucursal,
+    t.usuario_id,
+    u.nombre || ' ' || u.apellido                       AS cajero,
+    t.fecha_apertura,
+    t.monto_apertura,
+    COUNT(DISTINCT v.venta_id) FILTER (WHERE v.estado = 'COMPLETADA') AS total_ventas_count,
+    COALESCE(SUM(v.total) FILTER (WHERE v.estado = 'COMPLETADA'), 0) AS total_ventas_monto,
+    COALESCE(SUM(pv_ef.monto), 0)                       AS total_efectivo,
+    COALESCE(SUM(pv_qr.monto), 0)                       AS total_qr,
+    COALESCE(SUM(e.monto), 0)                           AS total_egresos,
+    COALESCE(SUM(ie.monto), 0)                          AS total_ingresos_extra,
+    -- Saldo esperado en caja (efectivo)
+    t.monto_apertura
+        + COALESCE(SUM(pv_ef.monto), 0)
+        + COALESCE(SUM(ie_ef.monto), 0)
+        - COALESCE(SUM(e_ef.monto), 0)                  AS saldo_esperado_efectivo
+FROM turnos t
+JOIN sucursales s   ON s.sucursal_id = t.sucursal_id
+JOIN usuarios u     ON u.usuario_id  = t.usuario_id
+LEFT JOIN ventas v  ON v.turno_id    = t.turno_id
+LEFT JOIN pagos_venta pv_ef ON pv_ef.venta_id = v.venta_id
+    AND pv_ef.metodo_pago_id = (SELECT metodo_pago_id FROM metodos_pago WHERE nombre = 'EFECTIVO')
+LEFT JOIN pagos_venta pv_qr ON pv_qr.venta_id = v.venta_id
+    AND pv_qr.metodo_pago_id = (SELECT metodo_pago_id FROM metodos_pago WHERE nombre = 'QR')
+LEFT JOIN egresos e         ON e.turno_id = t.turno_id
+LEFT JOIN egresos e_ef      ON e_ef.turno_id = t.turno_id
+    AND e_ef.metodo_pago_id = (SELECT metodo_pago_id FROM metodos_pago WHERE nombre = 'EFECTIVO')
+LEFT JOIN ingresos_extraordinarios ie   ON ie.turno_id = t.turno_id
+LEFT JOIN ingresos_extraordinarios ie_ef ON ie_ef.turno_id = t.turno_id
+    AND ie_ef.metodo_pago_id = (SELECT metodo_pago_id FROM metodos_pago WHERE nombre = 'EFECTIVO')
+WHERE t.estado = 'ABIERTO'
+GROUP BY t.turno_id, t.numero_turno, t.sucursal_id, s.nombre,
+         t.usuario_id, u.nombre, u.apellido, t.fecha_apertura, t.monto_apertura;
+
+COMMENT ON VIEW v_resumen_turno_activo IS 'Vista para dashboard en tiempo real. HU14.';
+
+
+-- -----------------------------------------------------------------------------
+-- 11.2 VISTA: Historial de ventas con detalle (HU13)
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_historial_ventas AS
+SELECT
+    v.venta_id,
+    v.numero_venta,
+    t.numero_turno,
+    s.nombre                        AS sucursal,
+    u.nombre || ' ' || u.apellido   AS cajero,
+    v.total,
+    v.estado,
+    v.created_at                    AS fecha_venta,
+    STRING_AGG(
+        dv.cantidad::TEXT || 'x ' || p.nombre || ' (Bs. ' || dv.precio_unitario::TEXT || ')',
+        ' | '
+    )                               AS detalle_productos,
+    STRING_AGG(
+        mp.nombre || ': Bs. ' || pv.monto::TEXT,
+        ' | '
+    )                               AS metodos_pago
+FROM ventas v
+JOIN turnos t           ON t.turno_id   = v.turno_id
+JOIN sucursales s       ON s.sucursal_id = t.sucursal_id
+JOIN usuarios u         ON u.usuario_id = v.usuario_id
+LEFT JOIN detalle_ventas dv ON dv.venta_id = v.venta_id
+LEFT JOIN productos p       ON p.producto_id = dv.producto_id
+LEFT JOIN pagos_venta pv    ON pv.venta_id = v.venta_id
+LEFT JOIN metodos_pago mp   ON mp.metodo_pago_id = pv.metodo_pago_id
+GROUP BY v.venta_id, v.numero_venta, t.numero_turno, s.nombre,
+         u.nombre, u.apellido, v.total, v.estado, v.created_at;
+
+COMMENT ON VIEW v_historial_ventas IS 'Vista completa del historial de ventas con detalle de productos y métodos de pago. HU13.';
+
+
+-- -----------------------------------------------------------------------------
+-- 11.3 VISTA: Reporte de cierre diario (HU12)
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_cierre_diario AS
+SELECT
+    ct.cierre_id,
+    t.numero_turno,
+    s.nombre                            AS sucursal,
+    u.nombre || ' ' || u.apellido       AS cajero,
+    uc.nombre || ' ' || uc.apellido     AS cerrado_por,
+    t.fecha_apertura,
+    ct.fecha_cierre,
+    ct.monto_apertura,
+    ct.total_ventas_efectivo,
+    ct.total_ventas_qr,
+    ct.total_ventas,
+    ct.total_ingresos_extra,
+    ct.total_egresos,
+    ct.monto_esperado_efectivo,
+    ct.monto_real_efectivo,
+    ct.diferencia_efectivo,
+    ct.estado_conciliacion,
+    ct.observaciones
+FROM cierre_turno ct
+JOIN turnos t       ON t.turno_id    = ct.turno_id
+JOIN sucursales s   ON s.sucursal_id = t.sucursal_id
+JOIN usuarios u     ON u.usuario_id  = t.usuario_id
+JOIN usuarios uc    ON uc.usuario_id = ct.usuario_cierre_id;
+
+COMMENT ON VIEW v_cierre_diario IS 'Reporte de cierre de caja por turno. HU12.';
+
+
+-- -----------------------------------------------------------------------------
+-- 11.4 VISTA: Comparación de métodos de pago (HU15)
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_comparacion_metodos_pago AS
+SELECT
+    DATE(v.created_at)              AS fecha,
+    mp.nombre                       AS metodo_pago,
+    COUNT(DISTINCT v.venta_id)      AS cantidad_ventas,
+    SUM(pv.monto)                   AS monto_total,
+    AVG(pv.monto)                   AS ticket_promedio
+FROM pagos_venta pv
+JOIN ventas v           ON v.venta_id       = pv.venta_id
+JOIN metodos_pago mp    ON mp.metodo_pago_id = pv.metodo_pago_id
+WHERE v.estado = 'COMPLETADA'
+GROUP BY DATE(v.created_at), mp.nombre
+ORDER BY fecha DESC, monto_total DESC;
+
+COMMENT ON VIEW v_comparacion_metodos_pago IS 'Comparación de ingresos por método de pago. HU15.';
+
+
+-- -----------------------------------------------------------------------------
+-- 11.5 VISTA: Auditoría de movimientos por turno (HU16)
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_auditoria_turno AS
+SELECT
+    mc.movimiento_id,
+    t.numero_turno,
+    mc.tipo_movimiento,
+    mp.nombre                       AS metodo_pago,
+    mc.monto,
+    mc.saldo_acumulado,
+    mc.descripcion,
+    u.nombre || ' ' || u.apellido   AS registrado_por,
+    mc.created_at
+FROM movimientos_caja mc
+JOIN turnos t       ON t.turno_id    = mc.turno_id
+JOIN usuarios u     ON u.usuario_id  = mc.usuario_id
+LEFT JOIN metodos_pago mp ON mp.metodo_pago_id = mc.metodo_pago_id
+ORDER BY mc.turno_id, mc.created_at;
+
+COMMENT ON VIEW v_auditoria_turno IS 'Libro de caja con auditoría completa de movimientos por turno. HU16.';
+
+
+-- =============================================================================
+-- SECCIÓN 12: EJEMPLOS DE CONSULTAS OPERATIVAS
+-- =============================================================================
+
+-- QUERY 1: Ventas del día actual por sucursal
+-- SELECT * FROM v_historial_ventas
+-- WHERE fecha_venta::DATE = CURRENT_DATE
+-- ORDER BY fecha_venta DESC;
+
+-- QUERY 2: Resumen de todos los turnos abiertos actualmente
+-- SELECT * FROM v_resumen_turno_activo;
+
+-- QUERY 3: Productos más vendidos en el último mes
+-- SELECT
+--     p.nombre,
+--     SUM(dv.cantidad)            AS unidades_vendidas,
+--     SUM(dv.subtotal)            AS ingresos_generados
+-- FROM detalle_ventas dv
+-- JOIN ventas v   ON v.venta_id    = dv.venta_id
+-- JOIN productos p ON p.producto_id = dv.producto_id
+-- WHERE v.estado = 'COMPLETADA'
+--   AND v.created_at >= NOW() - INTERVAL '30 days'
+-- GROUP BY p.nombre
+-- ORDER BY unidades_vendidas DESC;
+
+-- QUERY 4: Conciliación de caja de un turno específico
+-- SELECT
+--     ct.*,
+--     cmp.metodo_pago_id,
+--     mp.nombre AS metodo,
+--     cmp.monto_calculado,
+--     cmp.monto_declarado,
+--     cmp.diferencia
+-- FROM cierre_turno ct
+-- JOIN conciliacion_metodo_pago cmp ON cmp.cierre_id = ct.cierre_id
+-- JOIN metodos_pago mp ON mp.metodo_pago_id = cmp.metodo_pago_id
+-- WHERE ct.turno_id = :turno_id;
+
+-- QUERY 5: Movimientos financieros de un turno (auditoría completa)
+-- SELECT * FROM v_auditoria_turno
+-- WHERE numero_turno = 'T-20260101-001';
+
+-- QUERY 6: Egresos por categoría en un rango de fechas
+-- SELECT
+--     ce.nombre   AS categoria,
+--     mp.nombre   AS metodo_pago,
+--     COUNT(*)    AS cantidad,
+--     SUM(e.monto) AS total
+-- FROM egresos e
+-- JOIN categorias_egreso ce ON ce.categoria_egreso_id = e.categoria_egreso_id
+-- JOIN metodos_pago mp ON mp.metodo_pago_id = e.metodo_pago_id
+-- WHERE e.created_at BETWEEN :fecha_inicio AND :fecha_fin
+-- GROUP BY ce.nombre, mp.nombre
+-- ORDER BY total DESC;
+
+-- QUERY 7: Reporte de conciliación stock vs ventas (HU20)
+-- SELECT
+--     p.nombre                                AS producto,
+--     sit.cantidad_inicial,
+--     COALESCE(SUM(dv.cantidad), 0)           AS unidades_vendidas,
+--     sit.cantidad_inicial - COALESCE(SUM(dv.cantidad), 0) AS stock_esperado_final
+-- FROM stock_inicial_turno sit
+-- JOIN productos p ON p.producto_id = sit.producto_id
+-- LEFT JOIN detalle_ventas dv ON dv.producto_id = sit.producto_id
+--     AND dv.venta_id IN (
+--         SELECT venta_id FROM ventas
+--         WHERE turno_id = sit.turno_id AND estado = 'COMPLETADA'
+--     )
+-- WHERE sit.turno_id = :turno_id
+-- GROUP BY p.nombre, sit.cantidad_inicial;
+
+
+-- =============================================================================
+-- SECCIÓN 13: ROLES DE BASE DE DATOS (SEGURIDAD)
+-- =============================================================================
+
+-- Rol de aplicación (acceso restringido solo a tablas necesarias)
+-- CREATE ROLE panda_app LOGIN PASSWORD 'strong_password_here';
+-- GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO panda_app;
+-- REVOKE DELETE ON ventas, movimientos_caja, auditoria FROM panda_app;
+-- GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO panda_app;
+
+-- Rol de solo lectura para reportes
+-- CREATE ROLE panda_reports LOGIN PASSWORD 'reports_password_here';
+-- GRANT SELECT ON ALL TABLES IN SCHEMA public TO panda_reports;
+
+
+-- =============================================================================
+-- FIN DEL SCRIPT
+-- Sistema: Panda Naicha - Gestión Centralizada de Ventas
+-- Tablas: 18 | Índices: 24 | Vistas: 5 | Triggers: 12 | Funciones: 5
+-- =============================================================================
