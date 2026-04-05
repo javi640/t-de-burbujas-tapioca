@@ -27,8 +27,12 @@
         <div id="products-list">
             @forelse($stockItems as $stock)
                 <div class="flex items-center gap-3"
-                     style="padding: .75rem; margin-bottom: .5rem; background: rgba(79,142,247,.04); border-radius: 8px; border: 1px solid var(--border); cursor: pointer;"
-                     onclick="addToCart({{ $stock->product->id }}, {{ json_encode($stock->product->name) }}, {{ $stock->product->price }}, {{ $stock->remainingQuantity() }})">
+                    style="padding: .75rem; margin-bottom: .5rem; background: rgba(79,142,247,.04); border-radius: 8px; border: 1px solid var(--border); cursor: pointer;"
+                    data-id="{{ $stock->product->id }}"
+                    data-name="{{ $stock->product->name }}"
+                    data-price="{{ $stock->product->price }}"
+                    data-qty="{{ $stock->remainingQuantity() }}"
+                    onclick="addToCart({{ $stock->product?->id ?? 0 }}, {{ json_encode($stock->product?->name ?? 'Producto no encontrado') }}, {{ $stock->product?->price ?? 0 }}, {{ $stock->remainingQuantity() }})">                    
                     <div style="flex: 1;">
                         <div class="font-bold text-sm">{{ $stock->product->name }}</div>
                         <div class="text-xs text-muted">{{ $stock->remainingQuantity() }} disponibles</div>
