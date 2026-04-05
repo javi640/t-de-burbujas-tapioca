@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class User extends Authenticatable
 {
     protected $fillable = [
-        'branch_id', 'role_id', 'username', 'name', 'password', 'is_active',
+        'branch_id', 'role_id', 'username', 'name', 'email', 'password', 'is_active',
     ];
 
     protected $hidden = ['password', 'remember_token'];
