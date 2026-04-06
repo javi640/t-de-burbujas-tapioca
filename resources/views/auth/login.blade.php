@@ -78,6 +78,10 @@
             <input type="password" name="password"
                    placeholder="Ingresa tu contraseña" required>
 
+            <a href="{{ route('password.request') }}" style="display: block; text-align: right; color: #94a3b8; font-size: 0.8rem; text-decoration: none; margin-bottom: 1rem;">
+                ¿Olvidaste tu contraseña?
+            </a>
+
             <button type="submit">Ingresar</button>
         </form>
     </div>

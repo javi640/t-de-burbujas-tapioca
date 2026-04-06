@@ -86,6 +86,19 @@ class AuthController extends Controller
             ? redirect()->route('login')->with('success', 'Contraseña restablecida.')
             : back()->withErrors(['email' => __($status)]);
     }
+
+    public function sendResetLink(Request $request): RedirectResponse
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT
+            ? back()->with('status', 'Te enviamos el enlace de recuperación.')
+            : back()->withErrors(['email' => 'No encontramos una cuenta con ese email.']);
+    }
  
     public function logout(): RedirectResponse
     {

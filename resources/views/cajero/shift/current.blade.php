@@ -15,13 +15,14 @@
 @endsection
 
 @section('page-title', 'Mi Turno Activo')
-@section('page-subtitle', 'Iniciado a las {{ $shift->start_time->format("H:i") }} del {{ $shift->start_time->format("d/m/Y") }}')
+
+{{-- ✅ FIX 1: usar bloque @section en lugar de string --}}
+@section('page-subtitle')
+    Iniciado a las {{ $shift->start_time->format('H:i') }} del {{ $shift->start_time->format('d/m/Y') }}
+@endsection
 
 @section('topbar-actions')
-    <form method="POST" action="{{ route('cajero.shift.close') }}" id="closeForm">
-        @csrf
-        <button type="button" onclick="showCloseModal()" class="btn btn-danger btn-sm">🔒 Cerrar Turno</button>
-    </form>
+    <button type="button" onclick="showCloseModal()" class="btn btn-danger btn-sm">🔒 Cerrar Turno</button>
 @endsection
 
 @section('content')
@@ -118,8 +119,8 @@
     </form>
 </div>
 
-{{-- Modal de cierre de turno --}}
-<div id="closeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:999; display:flex; align-items:center; justify-content:center;" hidden>
+{{-- ✅ FIX 2: Modal con display:none SOLAMENTE, sin el segundo display:flex --}}
+<div id="closeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:999; align-items:center; justify-content:center;">
     <div class="card" style="max-width:440px; width:90%;">
         <div class="card-title mb-4">🔒 Cerrar Turno</div>
         <form method="POST" action="{{ route('cajero.shift.close') }}">
@@ -152,7 +153,7 @@
 @section('scripts')
 <script>
     const modal = document.getElementById('closeModal');
-    function showCloseModal() { modal.hidden = false; modal.style.display = 'flex'; }
-    function hideCloseModal() { modal.hidden = true; modal.style.display = 'none'; }
+    function showCloseModal() { modal.style.display = 'flex'; }
+    function hideCloseModal() { modal.style.display = 'none'; }
 </script>
 @endsection
