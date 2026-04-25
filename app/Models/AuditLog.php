@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AuditLog extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'user_id',
         'action',
@@ -15,15 +17,15 @@ class AuditLog extends Model
         'old_values',
         'new_values',
         'ip_address',
+        'created_at',
     ];
 
     protected $casts = [
         'old_values' => 'array',
         'new_values' => 'array',
     ];
-    
-    public $timestamps = false;
-    public function user(): BelongsTo
+
+    public function user(): BelongsTo   
     {
         return $this->belongsTo(User::class);
     }
