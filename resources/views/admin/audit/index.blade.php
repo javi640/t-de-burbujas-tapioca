@@ -25,30 +25,42 @@
 
 @section('content')
 
-{{-- ── Contadores por acción ────────────────────────────────── --}}
 @php
     $actionLabels = [
-        'login'       => ['Inicios de sesión', '🔑'],
-        'logout'      => ['Cierres de sesión',  '🚪'],
-        'open_shift'  => ['Aperturas de turno', '▶'],
-        'close_shift' => ['Cierres de turno',   '■'],
-        'void_sale'   => ['Anulaciones',         '⚠'],
+        'login'       => ['Inicios de sesión',  '🔑'],
+        'logout'      => ['Cierres de sesión',   '🚪'],
+        'open_shift'  => ['Aperturas de turno',  '▶'],
+        'close_shift' => ['Cierres de turno',    '■'],
+        'void_sale'   => ['Anulaciones',          '⚠'],
     ];
-    $actionColors = [
-        'login'       => 'accent',
-        'logout'      => 'muted',
-        'open_shift'  => 'success',
-        'close_shift' => 'warning',
-        'void_sale'   => 'danger',
+
+    // Clases CSS predefinidas para cada acción — evita variables dentro de style=""
+    $actionBadgeClass = [
+        'login'       => 'badge-info',
+        'logout'      => 'badge-gray',
+        'open_shift'  => 'badge-success',
+        'close_shift' => 'badge-warning',
+        'void_sale'   => 'badge-danger',
+    ];
+
+    // Color del número en los contadores
+    $actionCountStyle = [
+        'login'       => 'color:var(--accent)',
+        'logout'      => 'color:var(--muted)',
+        'open_shift'  => 'color:var(--success)',
+        'close_shift' => 'color:var(--warning)',
+        'void_sale'   => 'color:var(--danger)',
     ];
 @endphp
 
+{{-- ── Contadores por acción ────────────────────────────────── --}}
 <div class="stats-grid" style="grid-template-columns: repeat(5, 1fr); margin-bottom: 1rem;">
     @foreach($actionLabels as $key => [$label, $icon])
         <div class="stat-card" style="text-align:center;">
             <div style="font-size:1.3rem; margin-bottom:.25rem;">{{ $icon }}</div>
             <div class="stat-label" style="font-size:.68rem;">{{ $label }}</div>
-            <div class="stat-value mono" style="font-size:1.4rem; color:var(--{{ $actionColors[$key] ?? 'text' }});">
+            {{-- Usamos variable PHP para el estilo, no interpolación dentro de style="" --}}
+            <div class="stat-value mono" style="font-size:1.4rem; {{ $actionCountStyle[$key] ?? '' }}">
                 {{ $actionCounts[$key] ?? 0 }}
             </div>
         </div>
@@ -134,14 +146,10 @@
                 <tbody>
                     @foreach($logs as $log)
                         @php
-                            $color = match($log->action) {
-                                'open_shift'  => 'success',
-                                'close_shift' => 'warning',
-                                'void_sale'   => 'danger',
-                                'login'       => 'info',
-                                default       => 'gray',
-                            };
+                            // Clase del badge — definida en PHP, no interpolada en style=""
+                            $badgeClass  = $actionBadgeClass[$log->action] ?? 'badge-gray';
                             $actionLabel = $actionLabels[$log->action][0] ?? $log->action;
+                            $actionIcon  = $actionLabels[$log->action][1] ?? '';
                         @endphp
                         <tr>
                             {{-- Fecha/hora --}}
@@ -164,20 +172,10 @@
                                 @endif
                             </td>
 
-                            {{-- Acción con badge de color --}}
+                            {{-- Acción con badge — usa clase CSS, no style con variable --}}
                             <td>
-                                <span style="
-                                    display:inline-block;
-                                    padding:.2rem .6rem;
-                                    border-radius:20px;
-                                    font-size:.7rem;
-                                    font-weight:600;
-                                    background: var(--color-background-{{ $color }});
-                                    color: var(--color-text-{{ $color }});
-                                    border: 1px solid var(--color-border-{{ $color }});
-                                    white-space:nowrap;
-                                ">
-                                    {{ $actionLabels[$log->action][1] ?? '' }} {{ $actionLabel }}
+                                <span class="badge {{ $badgeClass }}" style="white-space:nowrap;">
+                                    {{ $actionIcon }} {{ $actionLabel }}
                                 </span>
                             </td>
 
@@ -221,18 +219,7 @@
                                                 <div style="font-size:.65rem; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:.4rem;">
                                                     Valores anteriores
                                                 </div>
-                                                <pre style="
-                                                    font-family:'DM Mono',monospace;
-                                                    font-size:.72rem;
-                                                    background:rgba(239,68,68,.05);
-                                                    border:1px solid rgba(239,68,68,.15);
-                                                    border-radius:6px;
-                                                    padding:.6rem .75rem;
-                                                    color:var(--danger);
-                                                    margin:0;
-                                                    white-space:pre-wrap;
-                                                    word-break:break-all;
-                                                ">{{ json_encode($log->old_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                                                <pre style="font-family:'DM Mono',monospace; font-size:.72rem; background:rgba(239,68,68,.05); border:1px solid rgba(239,68,68,.15); border-radius:6px; padding:.6rem .75rem; color:var(--danger); margin:0; white-space:pre-wrap; word-break:break-all;">{{ json_encode($log->old_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
                                             </div>
                                         @endif
 
@@ -241,18 +228,7 @@
                                                 <div style="font-size:.65rem; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:.4rem;">
                                                     Valores nuevos / registrados
                                                 </div>
-                                                <pre style="
-                                                    font-family:'DM Mono',monospace;
-                                                    font-size:.72rem;
-                                                    background:rgba(34,197,94,.05);
-                                                    border:1px solid rgba(34,197,94,.15);
-                                                    border-radius:6px;
-                                                    padding:.6rem .75rem;
-                                                    color:var(--success);
-                                                    margin:0;
-                                                    white-space:pre-wrap;
-                                                    word-break:break-all;
-                                                ">{{ json_encode($log->new_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                                                <pre style="font-family:'DM Mono',monospace; font-size:.72rem; background:rgba(34,197,94,.05); border:1px solid rgba(34,197,94,.15); border-radius:6px; padding:.6rem .75rem; color:var(--success); margin:0; white-space:pre-wrap; word-break:break-all;">{{ json_encode($log->new_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
                                             </div>
                                         @endif
 
