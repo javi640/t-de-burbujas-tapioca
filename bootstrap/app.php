@@ -16,6 +16,15 @@ return Application::configure(basePath: dirname(__DIR__))
         'no-cache' => \App\Http\Middleware\NoCacheMiddleware::class,
     ]);
     $middleware->appendToGroup('web', \App\Http\Middleware\NoCacheMiddleware::class);
+        $middleware->alias([
+            'role'          => \App\Http\Middleware\RoleMiddleware::class,
+            'no-back'       => \App\Http\Middleware\PreventBackHistory::class,
+        ]);
+
+        // Aplica no-cache a todas las rutas autenticadas
+        $middleware->web(append: [
+            \App\Http\Middleware\PreventBackHistory::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

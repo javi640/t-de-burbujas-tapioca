@@ -18,14 +18,25 @@ class StoreUserRequest extends FormRequest
             'branch_id' => ['required', 'exists:branches,id'],
         ];
     }
-
     public function messages(): array
     {
         return [
-            'username.regex'           => 'El usuario solo puede contener letras, números y guión bajo (_).',
-            'email.regex'              => 'El correo debe ser una cuenta de Gmail (@gmail.com).',
-            'password.confirmed'       => 'Las contraseñas no coinciden.',
+            'name.required'            => 'El nombre es obligatorio.',
+            'name.max'                 => 'El nombre no puede superar 100 caracteres.',
+            'username.required'        => 'El nombre de usuario es obligatorio.',
+            'username.unique'          => 'Ese nombre de usuario ya está en uso.',
+            'username.regex'           => 'El usuario solo puede contener letras, números y guión bajo.',
+            'email.required'           => 'El correo electrónico es obligatorio.',
+            'email.email'              => 'El correo no tiene un formato válido.',
+            'email.unique'             => 'Ese correo ya está registrado.',
+            'email.regex'              => 'Solo se permiten correos de Gmail (@gmail.com).',
+            'password.required'        => 'La contraseña es obligatoria.',
             'password.min'             => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.confirmed'       => 'Las contraseñas no coinciden.',
+            'role_id.required'         => 'Debes seleccionar un rol.',
+            'role_id.exists'           => 'El rol seleccionado no existe.',
+            'branch_id.required'       => 'Debes seleccionar una sucursal.',
+            'branch_id.exists'         => 'La sucursal seleccionada no existe.',
         ];
     }
 }

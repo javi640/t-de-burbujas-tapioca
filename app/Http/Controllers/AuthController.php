@@ -1,27 +1,38 @@
 <?php
 
 namespace App\Http\Controllers;
- 
+
 use App\Http\Requests\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use App\Models\AuditLog;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
 use App\Models\User;
- 
+
 class AuthController extends Controller
 {
-    public function showLogin(): View
+    public function showLogin(): View|RedirectResponse
     {
+        // Si ya está autenticado, redirigir a su área
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            }
+            if ($user->hasOpenShift()) {
+                return redirect()->route('cajero.shift.current');
+            }
+            return redirect()->route('cajero.shift.open');
+        }
+
         return view('auth.login');
     }
- 
+
     public function login(LoginRequest $request): RedirectResponse
     {
         $credentials = [
@@ -29,15 +40,15 @@ class AuthController extends Controller
             'password'  => $request->password,
             'is_active' => true,
         ];
- 
+
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
                 ->withInput(['username' => $request->username])
-                ->withErrors(['username' => 'Credenciales incorrectas.']);
+                ->withErrors(['username' => 'Credenciales incorrectas o cuenta inactiva.']);
         }
- 
+
         $request->session()->regenerate();
- 
+
         $user = $this->authUser();
 
         // Auditoría de login
@@ -46,19 +57,18 @@ class AuthController extends Controller
             'action'     => 'login',
             'ip_address' => $request->ip(),
         ]);
- 
-        // Redirigir según rol
+
         if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
- 
-        // Cajero: verificar si tiene turno abierto
+
         if ($user->hasOpenShift()) {
             return redirect()->route('cajero.shift.current');
         }
- 
+
         return redirect()->route('cajero.shift.open');
     }
+
     public function showResetForm(string $token): View
     {
         return view('auth.reset-password', ['token' => $token]);
@@ -83,30 +93,50 @@ class AuthController extends Controller
         );
 
         return $status === Password::PasswordReset
-            ? redirect()->route('login')->with('success', 'Contraseña restablecida.')
+            ? redirect()->route('login')->with('success', 'Contraseña restablecida correctamente.')
             : back()->withErrors(['email' => __($status)]);
     }
 
     public function sendResetLink(Request $request): RedirectResponse
     {
-        $request->validate(['email' => 'required|email']);
+        $request->validate([
+            'email' => 'required|email|regex:/@gmail\.com$/i',
+        ], [
+            'email.required' => 'El correo es obligatorio.',
+            'email.email'    => 'El formato del correo no es válido.',
+            'email.regex'    => 'Solo se permiten correos de Gmail (@gmail.com).',
+        ]);
 
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        $status = Password::sendResetLink($request->only('email'));
 
         return $status === Password::RESET_LINK_SENT
-            ? back()->with('status', 'Te enviamos el enlace de recuperación.')
-            : back()->withErrors(['email' => 'No encontramos una cuenta con ese email.']);
+            ? back()->with('status', 'Te enviamos el enlace de recuperación a tu Gmail.')
+            : back()->withErrors(['email' => 'No encontramos una cuenta con ese correo.']);
     }
- 
-    public function logout(): RedirectResponse
+
+    public function logout(Request $request): RedirectResponse
     {
+        $userId = Auth::id();
+
         Auth::logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
- 
-        return redirect()->route('login');
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Auditoría de logout
+        if ($userId) {
+            AuditLog::create([
+                'user_id'    => $userId,
+                'action'     => 'logout',
+                'ip_address' => $request->ip(),
+            ]);
+        }
+
+        return redirect()->route('login')
+            ->withHeaders([
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma'        => 'no-cache',
+                'Expires'       => 'Sat, 01 Jan 2000 00:00:00 GMT',
+            ]);
     }
 }
-
