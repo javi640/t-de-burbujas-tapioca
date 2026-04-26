@@ -10,8 +10,13 @@ use App\Http\Controllers\AdminSaleController;
 use App\Http\Controllers\AdminShiftController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\AdminReportController;
+
+
 // ── Ruta raíz ───────────────────────────────────────────────
 Route::get('/', fn() => redirect()->route('login'));
+Route::get('/reportes/cierre-diario', [AdminReportController::class, 'dailyReport'])->name('reports.daily');
+
 
 // ── Auth ─────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {

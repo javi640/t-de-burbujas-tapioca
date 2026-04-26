@@ -97,6 +97,14 @@ class SaleController extends Controller
             return back()->withErrors(['sale' => 'Esta venta ya fue anulada.']);
         }
 
+        request()->validate([
+            'void_reason' => ['required', 'string', 'min:5', 'max:500'],
+        ], [
+            'void_reason.required' => 'El motivo de anulación es obligatorio.',
+            'void_reason.min'      => 'El motivo debe tener al menos 5 caracteres.',
+            'void_reason.max'      => 'El motivo no puede superar los 500 caracteres.',
+        ]);
+
         DB::transaction(function () use ($sale) {
             $sale->update([
                 'status'      => 'VOIDED',

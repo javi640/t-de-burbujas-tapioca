@@ -24,7 +24,7 @@
                 @error('name')<div class="form-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
-                <label>Usuario</label>
+                <label>Usuario <span class="text-muted" style="font-size:.75rem;">(solo letras, números y _)</span></label>
                 <input type="text" name="username" value="{{ old('username') }}" placeholder="Ej: cajero2" required>
                 @error('username')<div class="form-error">{{ $message }}</div>@enderror
             </div>
@@ -32,14 +32,21 @@
 
         <div class="form-row">
             <div class="form-group">
-                <label>Email (para recuperación)</label>
-                <input type="email" name="email" value="{{ old('email') }}" placeholder="correo@ejemplo.com" required>
+                <label>Email Gmail <span class="text-muted" style="font-size:.75rem;">(@gmail.com)</span></label>
+                <input type="email" name="email" value="{{ old('email') }}" placeholder="correo@gmail.com" required>
                 @error('email')<div class="form-error">{{ $message }}</div>@enderror
             </div>
+        </div>
+
+        <div class="form-row">
             <div class="form-group">
                 <label>Contraseña</label>
                 <input type="password" name="password" placeholder="Mínimo 8 caracteres" required>
                 @error('password')<div class="form-error">{{ $message }}</div>@enderror
+            </div>
+            <div class="form-group">
+                <label>Confirmar Contraseña</label>
+                <input type="password" name="password_confirmation" placeholder="Repite la contraseña" required>
             </div>
         </div>
 

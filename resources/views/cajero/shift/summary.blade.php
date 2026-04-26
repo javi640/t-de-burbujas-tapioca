@@ -1,4 +1,3 @@
-{{-- resources/views/cajero/shift/summary.blade.php --}}
 @extends('layouts.app')
 @section('title', 'Resumen de Turno')
 
@@ -10,7 +9,9 @@
 @endsection
 
 @section('page-title', 'Resumen de Turno')
-@section('page-subtitle', 'Turno cerrado · {{ $shift->start_time->format("d/m/Y") }}')
+@section('page-subtitle')
+    Turno cerrado · {{ $shift->start_time->format('d/m/Y') }}
+@endsection    
 
 @section('content')
 <div class="stats-grid">
