@@ -11,12 +11,15 @@ use App\Http\Controllers\AdminShiftController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AdminReportController;
-
+use App\Http\Controllers\AdminAuditController;
 
 // ── Ruta raíz ───────────────────────────────────────────────
 Route::get('/', fn() => redirect()->route('login'));
 Route::get('/reportes/cierre-diario', [AdminReportController::class, 'dailyReport'])->name('reports.daily');
 
+
+Route::get('/reportes/cierre-diario', [AdminReportController::class, 'dailyReport'])->name('reports.daily');
+Route::get('/auditoria', [AdminAuditController::class, 'index'])->name('audit.index');
 
 // ── Auth ─────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {
