@@ -152,7 +152,7 @@
                 $shiftCash  = $shift->sales->where('status', 'COMPLETED')->where('payment_method', 'CASH')->sum('total_amount');
                 $shiftQr    = $shift->sales->where('status', 'COMPLETED')->where('payment_method', 'QR')->sum('total_amount');
                 $shiftCount = $shift->sales->where('status', 'COMPLETED')->count();
-                $duration   = $shift->start_time->diffForHumans(null, true); // "3 hours"
+                $duration = $shift->start_time->setTimezone('America/La_Paz')->diffForHumans(null, true);
             @endphp
             <div style="padding: .75rem; background: rgba(79,142,247,.05); border-radius: 8px; border: 1px solid var(--border); margin-bottom: .75rem;">
                 <div class="flex items-center gap-3" style="margin-bottom: .5rem;">
@@ -161,7 +161,7 @@
                     </div>
                     <div style="flex: 1">
                         <div class="text-sm font-bold">{{ $shift->user->name }}</div>
-                        <div class="text-xs text-muted">Desde {{ $shift->start_time->format('H:i') }} · hace {{ $duration }}</div>
+                        <div class="text-xs text-muted">Desde {{ $shift->start_time->setTimezone('America/La_Paz')->format('H:i') }} · hace {{ $duration }}</div>
                     </div>
                     <div class="text-right">
                         <div class="mono text-sm text-success">Bs {{ number_format($shiftTotal, 2) }}</div>

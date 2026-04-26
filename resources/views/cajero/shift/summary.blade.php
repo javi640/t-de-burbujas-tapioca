@@ -3,15 +3,21 @@
 
 @section('sidebar-nav')
     <span class="nav-section-label">Mi Turno</span>
-    <a href="{{ route('cajero.shift.open') }}" class="nav-item">
-        <span class="nav-icon">🔓</span> Abrir Turno
-    </a>
+    @if(auth()->user()->isAdmin())
+        <a href="{{ route('admin.shifts.index') }}" class="nav-item">
+            <span class="nav-icon">⏱</span> Ver Turnos
+        </a>
+    @else
+        <a href="{{ route('cajero.shift.open') }}" class="nav-item">
+            <span class="nav-icon">🔓</span> Abrir Turno
+        </a>
+    @endif
 @endsection
 
 @section('page-title', 'Resumen de Turno')
 @section('page-subtitle')
     Turno cerrado · {{ $shift->start_time->format('d/m/Y') }}
-@endsection    
+@endsection
 
 @section('content')
 <div class="stats-grid">
@@ -71,7 +77,9 @@
     </div>
 </div>
 
+@if(auth()->user()->isCajero())
 <div class="mt-4">
     <a href="{{ route('cajero.shift.open') }}" class="btn btn-primary">🔓 Abrir Nuevo Turno</a>
 </div>
+@endif
 @endsection

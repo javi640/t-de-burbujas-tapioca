@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  
 class Shift extends Model
 {
+    
     protected $fillable = [
         'user_id', 'status', 'start_time', 'end_time',
         'initial_cash', 'reported_cash', 'cash_difference', 'notes',
@@ -20,7 +21,11 @@ class Shift extends Model
         'reported_cash'   => 'decimal:2',
         'cash_difference' => 'decimal:2',
     ];
- 
+    protected function serializeDate(\DateTimeInterface $date): string
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
+    
     // ── Relaciones ──────────────────────────────────────────
  
     public function user(): BelongsTo

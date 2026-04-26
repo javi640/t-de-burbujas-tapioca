@@ -44,7 +44,7 @@ class AdminDashboardController extends Controller
         // ── Ventas por cajero (hoy) ──────────────────────────────────
         // Muestra cuánto vendió cada cajero hoy, separado por método de pago
         $salesByCashier = Sale::whereDate('sale_time', today())
-            ->where('status', 'COMPLETED')
+            ->where('sales.status', 'COMPLETED')
             ->join('shifts', 'sales.shift_id', '=', 'shifts.id')
             ->join('users', 'shifts.user_id', '=', 'users.id')
             ->select(

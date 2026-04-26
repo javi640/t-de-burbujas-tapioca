@@ -15,7 +15,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'role'     => \App\Http\Middleware\RoleMiddleware::class,
             'no-cache' => \App\Http\Middleware\NoCacheMiddleware::class,
         ]);
-        $middleware->appendToGroup('web', \App\Http\Middleware\NoCacheMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

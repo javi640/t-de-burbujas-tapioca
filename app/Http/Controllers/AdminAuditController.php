@@ -49,7 +49,7 @@ class AdminAuditController extends Controller
         // Lista de usuarios para el select de filtro
         $users = User::orderBy('name')->get(['id', 'name']);
 
-        // Contadores por tipo de acción (del período filtrado, sin paginar)
+        // Contadores por tipo de acción
         $countQuery = clone $query->getQuery();
         $actionCounts = AuditLog::query()
             ->when($request->filled('user_id'),  fn($q) => $q->where('user_id', $request->user_id))

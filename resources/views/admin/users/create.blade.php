@@ -17,18 +17,6 @@
 @section('content')
 <div class="card" style="max-width: 640px;">
 
-    {{-- Indicador de requisitos --}}
-    <div
-        class="alert"
-        style="background: rgba(79,142,247,.08); border: 1px solid rgba(79,142,247,.2); color: var(--accent); margin-bottom: 1.5rem;"
-    >
-        <span>ℹ</span>
-        <span>
-            Solo se permiten correos de <strong>Gmail (@gmail.com)</strong>
-            para todos los usuarios del sistema.
-        </span>
-    </div>
-
     <form
         method="POST"
         action="{{ route('admin.users.store') }}"

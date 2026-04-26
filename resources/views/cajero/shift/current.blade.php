@@ -9,7 +9,7 @@
     <a href="{{ route('cajero.sales.create') }}" class="nav-item">
         <span class="nav-icon">🛒</span> Nueva Venta
     </a>
-    <a href="#movements" class="nav-item">
+    <a href="javascript:void(0)" onclick="document.getElementById('movements').scrollIntoView({behavior:'smooth'})" class="nav-item">
         <span class="nav-icon">💰</span> Movimientos
     </a>
 @endsection
@@ -18,7 +18,7 @@
 
 {{-- ✅ FIX 1: usar bloque @section en lugar de string --}}
 @section('page-subtitle')
-    Iniciado a las {{ $shift->start_time->format('H:i') }} del {{ $shift->start_time->format('d/m/Y') }}
+    Iniciado a las {{ $shift->start_time->setTimezone('America/La_Paz')->format('H:i') }} del {{ $shift->start_time->setTimezone('America/La_Paz')->format('d/m/Y') }}
 @endsection
 
 @section('topbar-actions')

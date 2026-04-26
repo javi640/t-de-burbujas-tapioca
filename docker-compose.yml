@@ -8,6 +8,8 @@ services:
     container_name: panda_app
     restart: unless-stopped
     working_dir: /var/www
+    environment:
+      TZ: America/La_Paz
     volumes:
       - .:/var/www
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
@@ -41,6 +43,7 @@ services:
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_USER: panda
       MYSQL_PASSWORD: secret
+      TZ: America/La_Paz
     ports:
       - "3307:3306"
     volumes:
