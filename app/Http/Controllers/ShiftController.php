@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\DecisionTreeService;
 use App\Http\Requests\OpenShiftRequest;
 use App\Http\Requests\CloseShiftRequest;
 use App\Models\Shift;
@@ -95,12 +96,14 @@ class ShiftController extends Controller
             $expectedCash = $shift->expectedCash();
             $reportedCash = $request->reported_cash;
             $difference   = $reportedCash - $expectedCash;
+            $treeResult = app(DecisionTreeService::class)->evaluate($expectedCash, $reportedCash);
 
             $shift->update([
                 'status'          => 'CLOSED',
                 'end_time'        => now(),
                 'reported_cash'   => $reportedCash,
                 'cash_difference' => $difference,
+                'inconsistency_class'   => $treeResult['classification'],
                 'notes'           => $request->notes,
             ]);
 

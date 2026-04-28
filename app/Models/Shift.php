@@ -10,8 +10,8 @@ class Shift extends Model
 {
     
     protected $fillable = [
-        'user_id', 'status', 'start_time', 'end_time',
-        'initial_cash', 'reported_cash', 'cash_difference', 'notes',
+        'user_id', 'status', 'start_time', 'end_time', 'initial_cash', 
+        'reported_cash', 'cash_difference', 'inconsistency_class', 'notes',
     ];
  
     protected $casts = [
