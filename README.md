@@ -1,10 +1,10 @@
-# 🧋 Panda Naicha
+#  Panda Naicha
 
 Sistema de gestión para tienda de bubble tea (POS + control de caja + turnos + auditoría).
 
 ---
 
-## 🚀 Cómo correr el proyecto
+##  Cómo correr el proyecto
 
 **Necesitás tener instalado:**
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
@@ -22,7 +22,7 @@ docker-compose up --build
 La primera vez tarda 2-3 minutos (descarga e instala todo). Cuando veas:
 
 ```
-🚀 Arrancando php-fpm...
+ Arrancando php-fpm...
 ```
 
 Abrí 👉 **http://localhost:8080**
