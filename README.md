@@ -1,3 +1,65 @@
+#  Panda Naicha
+
+Sistema de gestión para tienda de bubble tea (POS + control de caja + turnos + auditoría).
+
+---
+
+##  Cómo correr el proyecto
+
+**Necesitás tener instalado:**
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Git](https://git-scm.com/) (o GitHub Desktop)
+
+**3 comandos y listo:**
+
+```bash
+git clone https://github.com/javi640/t-de-burbujas-tapioca.git
+cd t-de-burbujas-tapioca
+cp .env.example .env
+docker-compose up --build
+```
+
+La primera vez tarda 2-3 minutos (descarga e instala todo). Cuando veas:
+
+```
+ Arrancando php-fpm...
+```
+
+Abrí 👉 **http://localhost:8080**
+
+---
+
+## 🛠️ Comandos útiles
+
+| Qué querés hacer | Comando |
+|---|---|
+| Apagar todo | `docker-compose down` |
+| Apagar y borrar la BD | `docker-compose down -v` |
+| Ver logs en vivo | `docker-compose logs -f` |
+| Entrar al contenedor PHP | `docker exec -it panda_app bash` |
+| Correr `artisan` | `docker exec panda_app php artisan <comando>` |
+
+---
+
+## 📂 Estructura corta
+
+- `app/` — la lógica del sistema (controladores, modelos)
+- `database/migrations/` — el diseño de la BD
+- `resources/views/` — las pantallas (HTML con Blade)
+- `routes/web.php` — qué URL muestra qué pantalla
+- `docker/` — todo lo de Docker
+
+---
+
+## ❓ ¿Algo no funciona?
+
+1. Asegurate de tener Docker Desktop **abierto y corriendo**.
+2. Probá `docker-compose down -v` y después `docker-compose up --build` de nuevo.
+3. Si seguís con drama, copiá el error y mandalo al grupo.
+
+
+
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">

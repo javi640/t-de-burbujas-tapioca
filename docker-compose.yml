@@ -1,6 +1,4 @@
 services:
-
-  # ── Aplicación Laravel ───────────────────────────────────
   app:
     build:
       context: .
@@ -8,6 +6,8 @@ services:
     container_name: panda_app
     restart: unless-stopped
     working_dir: /var/www
+    env_file:
+      - .env
     environment:
       TZ: America/La_Paz
     volumes:
@@ -16,9 +16,9 @@ services:
     networks:
       - panda_network
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
-  # ── Servidor Web Nginx ───────────────────────────────────
   nginx:
     image: nginx:alpine
     container_name: panda_nginx
@@ -33,16 +33,15 @@ services:
     depends_on:
       - app
 
-  # ── Base de Datos MySQL ──────────────────────────────────
   mysql:
     image: mysql:8.0
     container_name: panda_mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: proyectoprueba
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_USER: panda
-      MYSQL_PASSWORD: secret
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-secret}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
       TZ: America/La_Paz
     ports:
       - "3307:3306"
@@ -50,24 +49,13 @@ services:
       - panda_mysql_data:/var/lib/mysql
     networks:
       - panda_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-secret}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
 
-  # ── phpMyAdmin (gestor visual de BD) ────────────────────
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: panda_phpmyadmin
-    restart: unless-stopped
-    ports:
-      - "8081:80"
-    environment:
-      PMA_HOST: mysql
-      PMA_USER: root
-      PMA_PASSWORD: secret
-    networks:
-      - panda_network
-    depends_on:
-      - mysql
-
-# ── Volúmenes y Red ─────────────────────────────────────────
 volumes:
   panda_mysql_data:
 
