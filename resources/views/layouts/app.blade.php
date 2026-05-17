@@ -474,7 +474,7 @@
 {{-- Sidebar --}}
 <aside class="sidebar">
     <div class="sidebar-logo">
-        <img src="25" alt="25" class="logo-icon">C:\Users\ASUS\Documents\t-de-burbujas-tapioca\resources\views\image\logo.png</img>
+        <img src="../image/logo.png" alt="25" class="logo-icon"/>
         <div>
             <div class="logo-text">Panda Naicha</div>
             <div class="logo-sub">Sistema de Gestión</div>
