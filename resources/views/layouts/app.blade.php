@@ -60,8 +60,10 @@
         }
 
         .sidebar-logo .logo-icon {
-            font-size: 1.75rem;
-            line-height: 1;
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            flex-shrink: 0;
         }
 
         .sidebar-logo .logo-text {
@@ -465,6 +467,17 @@
             .sidebar { transform: translateX(-100%); }
             .main { margin-left: 0; }
             .form-row { grid-template-columns: 1fr; }
+            .sidebar-logo { padding: 1.25rem 1rem; }
+            .sidebar-logo .logo-icon { width: 40px; height: 40px; }
+            .sidebar-logo .logo-text { font-size: .75rem; }
+            .sidebar-logo .logo-sub { font-size: .65rem; }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar-logo { padding: 1rem 0.75rem; gap: 0.5rem; }
+            .sidebar-logo .logo-icon { width: 35px; height: 35px; }
+            .sidebar-logo .logo-text { font-size: .7rem; }
+            .sidebar-logo .logo-sub { font-size: .6rem; }
         }
     </style>
     @yield('styles')
@@ -474,7 +487,7 @@
 {{-- Sidebar --}}
 <aside class="sidebar">
     <div class="sidebar-logo">
-        <img src="../image/logo.png" alt="25" class="logo-icon"/>
+        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-icon"/>
         <div>
             <div class="logo-text">Panda Naicha</div>
             <div class="logo-sub">Sistema de Gestión</div>
