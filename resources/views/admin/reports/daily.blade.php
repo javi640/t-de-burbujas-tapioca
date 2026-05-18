@@ -233,19 +233,19 @@
                 <div>
                     <div style="font-size:.68rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:.75rem;">Arqueo de caja</div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-bottom:.75rem;">
-                        <div style="background:rgba(10,15,30,.3); border-radius:8px; padding:.75rem;">
+                        <div style="background:rgba(184,204,202,.15); border-radius:8px; padding:.75rem;">
                             <div style="font-size:.65rem; color:var(--muted); margin-bottom:.25rem;">Ef. inicial</div>
                             <div class="mono" style="font-size:.9rem;">Bs {{ number_format($shift->initial_cash, 2) }}</div>
                         </div>
-                        <div style="background:rgba(10,15,30,.3); border-radius:8px; padding:.75rem;">
+                        <div style="background:rgba(184,204,202,.15); border-radius:8px; padding:.75rem;">
                             <div style="font-size:.65rem; color:var(--muted); margin-bottom:.25rem;">Ventas efectivo</div>
                             <div class="mono" style="font-size:.9rem;">Bs {{ number_format($shiftSalesCash, 2) }}</div>
                         </div>
-                        <div style="background:rgba(10,15,30,.3); border-radius:8px; padding:.75rem;">
+                        <div style="background:rgba(184,204,202,.15); border-radius:8px; padding:.75rem;">
                             <div style="font-size:.65rem; color:var(--muted); margin-bottom:.25rem;">Egresos</div>
                             <div class="mono text-danger" style="font-size:.9rem;">− Bs {{ number_format($shiftExpenses, 2) }}</div>
                         </div>
-                        <div style="background:rgba(10,15,30,.3); border-radius:8px; padding:.75rem;">
+                        <div style="background:rgba(184,204,202,.15); border-radius:8px; padding:.75rem;">
                             <div style="font-size:.65rem; color:var(--muted); margin-bottom:.25rem;">Ing. extra</div>
                             <div class="mono text-warning" style="font-size:.9rem;">+ Bs {{ number_format($shiftIncomes, 2) }}</div>
                         </div>
@@ -255,7 +255,7 @@
                             <div style="font-size:.65rem; color:var(--muted); margin-bottom:.25rem;">Esperado</div>
                             <div class="mono text-accent" style="font-size:1.1rem; font-weight:700;">Bs {{ number_format($expected, 2) }}</div>
                         </div>
-                        <div style="background:rgba(10,15,30,.4); border-radius:8px; padding:.75rem; border:1px solid {{ $borderColor }};">
+                        <div style="background:rgba(184,204,202,.2); border-radius:8px; padding:.75rem; border:1px solid {{ $borderColor }};">
                             <div style="font-size:.65rem; color:var(--muted); margin-bottom:.25rem;">Declarado</div>
                             <div class="mono" style="font-size:1.1rem; font-weight:700; color:var(--{{ $decision['color'] }});">Bs {{ number_format($reported, 2) }}</div>
                         </div>
@@ -300,7 +300,7 @@
                         padding:.75rem;
                         border-radius:8px;
                         border-left:3px solid var(--{{ $decision['color'] }});
-                        background:rgba(10,15,30,.3);
+                        background:rgba(184,204,202,.15);
                         font-size:.75rem;
                         line-height:1.6;
                         color:var(--text);
@@ -385,7 +385,7 @@
         @php $pct = round(($product->units_sold / $maxUnits) * 100); @endphp
         <div style="margin-bottom:.85rem;">
             <div class="flex items-center gap-2" style="margin-bottom:.3rem;">
-                <span class="mono" style="font-size:.7rem; width:1.4rem; height:1.4rem; display:flex; align-items:center; justify-content:center; background:rgba(79,142,247,.12); border-radius:50%; color:var(--accent); font-weight:700; flex-shrink:0;">{{ $i+1 }}</span>
+                <span class="mono" style="font-size:.7rem; width:1.4rem; height:1.4rem; display:flex; align-items:center; justify-content:center; background:rgba(133,184,203,.15); border-radius:50%; color:var(--accent); font-weight:700; flex-shrink:0;">{{ $i+1 }}</span>
                 <span class="text-sm font-bold" style="flex:1;">{{ $product->name }}</span>
                 <span class="mono text-xs text-muted">{{ $product->units_sold }} u.</span>
                 <span class="mono text-sm text-success">Bs {{ number_format($product->revenue, 2) }}</span>

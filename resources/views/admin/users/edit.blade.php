@@ -81,7 +81,7 @@
             </div>
 
             {{-- Contraseñas --}}
-            <div style="background: rgba(79,142,247,.04); border: 1px solid rgba(79,142,247,.15); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+            <div style="background: rgba(133,184,203,.08); border: 1px solid rgba(133,184,203,.25); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
                 <div class="text-xs text-muted" style="margin-bottom: .75rem; font-weight:600; text-transform:uppercase; letter-spacing:.05em;">
                     🔒 Cambiar Contraseña (opcional)
                 </div>
