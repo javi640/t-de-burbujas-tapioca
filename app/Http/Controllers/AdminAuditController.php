@@ -10,11 +10,13 @@ use Illuminate\View\View;
 class AdminAuditController extends Controller
 {
     const ACTION_LABELS = [
-        'login'       => 'Inicio de sesión',
-        'logout'      => 'Cierre de sesión',
-        'open_shift'  => 'Apertura de turno',
-        'close_shift' => 'Cierre de turno',
-        'void_sale'   => 'Anulación de venta',
+        'login'                    => 'Inicio de sesión',
+        'logout'                   => 'Cierre de sesión',
+        'open_shift'               => 'Apertura de turno',
+        'open_shift_for_cajero'    => 'Apertura de turno para cajero',
+        'close_shift'              => 'Cierre de turno',
+        'void_sale'                => 'Anulación de venta',
+        'cajero_login_registered'  => 'Registro de asistencia',
     ];
 
     public function index(Request $request): View
