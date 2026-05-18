@@ -31,10 +31,12 @@
             margin-bottom: 2rem;
         }
 
-        .logo-area .icon {
-            font-size: 3.5rem;
+        .logo-area .logo-icon {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
             display: block;
-            margin-bottom: .5rem;
+            margin: 0 auto .5rem;
         }
 
         .logo-area h1 {
@@ -208,12 +210,35 @@
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Media Queries para Responsividad ─── */
+        @media (max-width: 768px) {
+            .login-wrapper { max-width: 350px; padding: .8rem; }
+            .logo-area { margin-bottom: 1.5rem; }
+            .logo-area .logo-icon { width: 80px; height: 80px; }
+            .logo-area h1 { font-size: 1.2rem; }
+            .logo-area p { font-size: .8rem; }
+            .card { padding: 1.5rem; }
+        }
+
+        @media (max-width: 480px) {
+            .login-wrapper { max-width: 100%; padding: .6rem; }
+            .logo-area { margin-bottom: 1.25rem; }
+            .logo-area .logo-icon { width: 60px; height: 60px; }
+            .logo-area h1 { font-size: 1rem; }
+            .logo-area p { font-size: .75rem; }
+            .card { padding: 1.25rem; }
+            .form-group { margin-bottom: 1rem; }
+            label { font-size: .7rem; }
+            input { padding: .6rem .8rem; font-size: .9rem; }
+            .btn-submit { padding: .7rem; font-size: .95rem; }
+        }
     </style>
 </head>
 <body>
     <div class="login-wrapper">
         <div class="logo-area">
-            <span class="icon">🐼</span>
+            <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-icon"/>
             <h1>Panda Naicha</h1>
             <p>Sistema de Gestión de Ventas</p>
         </div>
