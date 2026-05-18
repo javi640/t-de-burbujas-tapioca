@@ -39,41 +39,47 @@
 
 @php
     $actionLabels = [
-        'login'       => ['Inicios de sesión',  'login'],
-        'logout'      => ['Cierres de sesión',   'logout'],
-        'open_shift'  => ['Aperturas de turno',  'open_shift'],
-        'close_shift' => ['Cierres de turno',    'close_shift'],
-        'void_sale'   => ['Anulaciones',          'void_sale'],
+        'login'                   => ['Inicios de sesión',           'login'],
+        'logout'                  => ['Cierres de sesión',           'logout'],
+        'open_shift'              => ['Aperturas de turno',          'open_shift'],
+        'open_shift_for_cajero'   => ['Apertura de turno a cajero', 'open_shift_for_cajero'],
+        'close_shift'             => ['Cierres de turno',           'close_shift'],
+        'void_sale'               => ['Anulaciones',                 'void_sale'],
+        'cajero_login_registered' => ['Registro de asistencia',     'cajero_login_registered'],
     ];
     $actionIcons = [
-        'login'       => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>',
-        'logout'      => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
-        'open_shift'  => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--success)"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>',
-        'close_shift' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--warning)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-        'void_sale'   => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--danger)"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+        'login'                   => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>',
+        'logout'                  => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+        'open_shift'              => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--success)"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>',
+        'open_shift_for_cajero'   => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--success)"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>',
+        'close_shift'             => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--warning)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+        'void_sale'               => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--danger)"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+        'cajero_login_registered' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#a78bfa"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>',
     ];
 
-    // Clases CSS predefinidas para cada acción — evita variables dentro de style=""
     $actionBadgeClass = [
-        'login'       => 'badge-info',
-        'logout'      => 'badge-gray',
-        'open_shift'  => 'badge-success',
-        'close_shift' => 'badge-warning',
-        'void_sale'   => 'badge-danger',
+        'login'                   => 'badge-info',
+        'logout'                  => 'badge-gray',
+        'open_shift'              => 'badge-success',
+        'open_shift_for_cajero'   => 'badge-success',
+        'close_shift'             => 'badge-warning',
+        'void_sale'               => 'badge-danger',
+        'cajero_login_registered' => 'badge-purple',
     ];
 
-    // Color del número en los contadores
     $actionCountStyle = [
-        'login'       => 'color:var(--accent)',
-        'logout'      => 'color:var(--muted)',
-        'open_shift'  => 'color:var(--success)',
-        'close_shift' => 'color:var(--warning)',
-        'void_sale'   => 'color:var(--danger)',
+        'login'                   => 'color:var(--accent)',
+        'logout'                  => 'color:var(--muted)',
+        'open_shift'              => 'color:var(--success)',
+        'open_shift_for_cajero'   => 'color:var(--success)',
+        'close_shift'             => 'color:var(--warning)',
+        'void_sale'               => 'color:var(--danger)',
+        'cajero_login_registered' => 'color:#a78bfa',
     ];
 @endphp
 
 {{-- ── Contadores por acción ────────────────────────────────── --}}
-<div class="stats-grid" style="grid-template-columns: repeat(5, 1fr); margin-bottom: 1rem;">
+<div class="stats-grid" style="grid-template-columns: repeat(7, 1fr); margin-bottom: 1rem;">
     @foreach($actionLabels as $key => [$label, $icon])
         <div class="stat-card" style="text-align:center;">
             <div style="display:flex;justify-content:center;margin-bottom:.5rem;">{!! $actionIcons[$key] ?? '' !!}</div>
@@ -191,10 +197,10 @@
                                 @endif
                             </td>
 
-                            {{-- Acción con badge — usa clase CSS, no style con variable --}}
+                            {{-- Acción con badge — solo muestra la etiqueta legible --}}
                             <td>
                                 <span class="badge {{ $badgeClass }}" style="white-space:nowrap;">
-                                    {{ $actionIcon }} {{ $actionLabel }}
+                                    {{ $actionLabel }}
                                 </span>
                             </td>
 
