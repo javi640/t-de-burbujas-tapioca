@@ -8,8 +8,8 @@
             <span class="nav-icon">⏱</span> Ver Turnos
         </a>
     @else
-        <a href="{{ route('cajero.shift.open') }}" class="nav-item">
-            <span class="nav-icon">🔓</span> Abrir Turno
+        <a href="{{ route('cajero.shift.waiting') }}" class="nav-item">
+            <span class="nav-icon">⏳</span> Mi Turno
         </a>
     @endif
 @endsection

@@ -41,22 +41,42 @@ class DatabaseSeeder extends Seeder
             'password'  => Hash::make('cajero123'),
         ]);
 
-        // Productos de Panda Naicha
-        $products = [
+        // ── Bebidas ──────────────────────────────────────────────
+        $bebidas = [
             ['name' => 'Naicha Original',  'price' => 15.00],
             ['name' => 'Naicha Frutilla',  'price' => 17.00],
             ['name' => 'Naicha Mango',     'price' => 17.00],
             ['name' => 'Naicha Maracuyá',  'price' => 17.00],
             ['name' => 'Naicha Matcha',    'price' => 20.00],
             ['name' => 'Taro Latte',       'price' => 22.00],
-            ['name' => 'Topping Extra',    'price' => 5.00],
         ];
 
-        foreach ($products as $product) {
+        foreach ($bebidas as $product) {
             Product::create([
                 'branch_id' => $branch->id,
                 'name'      => $product['name'],
                 'price'     => $product['price'],
+                'is_active' => true,
+            ]);
+        }
+
+        // ── Toppings / Extras ─────────────────────────────────────
+        $toppings = [
+            ['name' => 'Tapioca Pearls',  'price' => 5.00],
+            ['name' => 'Nata de Coco',    'price' => 5.00],
+            ['name' => 'Pudding Jelly',   'price' => 5.00],
+            ['name' => 'Oreo Crumbs',     'price' => 5.00],
+            ['name' => 'Mango Boba',      'price' => 5.00],
+            ['name' => 'Strawberry Boba', 'price' => 5.00],
+            ['name' => 'Passion Boba',    'price' => 5.00],
+            ['name' => 'Coffee Jelly',    'price' => 5.00],
+        ];
+
+        foreach ($toppings as $topping) {
+            Product::create([
+                'branch_id' => $branch->id,
+                'name'      => $topping['name'],
+                'price'     => $topping['price'],
                 'is_active' => true,
             ]);
         }

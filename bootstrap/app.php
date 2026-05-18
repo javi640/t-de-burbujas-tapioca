@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role'     => \App\Http\Middleware\RoleMiddleware::class,
-            'no-cache' => \App\Http\Middleware\NoCacheMiddleware::class,
+            'prevent-cache' => \App\Http\Middleware\PreventCache::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

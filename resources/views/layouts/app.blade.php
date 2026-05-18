@@ -496,7 +496,7 @@
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="btn-logout">
-                <span>⬡</span> Cerrar sesión
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Cerrar sesión
             </button>
         </form>
     </div>
@@ -538,5 +538,29 @@
 
 @yield('scripts')
 @stack('scripts')
+
+<script>
+// ── Seguridad: bloquear acceso con botón "atrás" tras cerrar sesión ──
+(function() {
+    // Marcar esta página como autenticada
+    if (typeof window.history.pushState === 'function') {
+        window.history.pushState({ authenticated: true }, '');
+    }
+    // Si el usuario navega "atrás" a esta página sin sesión activa,
+    // el servidor rechazará la petición. Forzamos verificación.
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            // Página restaurada desde caché del navegador
+            fetch(window.location.href, { method: 'HEAD', credentials: 'same-origin' })
+                .then(res => {
+                    if (res.redirected || res.url.includes('login')) {
+                        window.location.replace('/login');
+                    }
+                })
+                .catch(() => window.location.replace('/login'));
+        }
+    });
+})();
+</script>
 </body>
 </html>
