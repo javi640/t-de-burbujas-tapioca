@@ -316,18 +316,32 @@
     </div>
 
     <script>
-        // ── Prevenir regreso con botón Atrás después del logout ──────
-        // Reemplaza la entrada del historial actual para que al presionar
-        // "atrás" desde cualquier página autenticada no pueda regresar.
-        if (window.history && window.history.replaceState) {
-            window.history.replaceState(null, document.title, window.location.href);
-        }
+        // ── Seguridad: Prevenir regreso con botón Atrás después del logout ──
+        (function() {
+            // Reemplaza el estado del historial para bloquear el botón atrás
+            window.history.replaceState(null, null, window.location.href);
+            
+            // Detecta cualquier intento de navegar hacia atrás
+            window.addEventListener('popstate', function() {
+                window.location.replace('{{ route('login') }}');
+            });
 
-        // Detecta si el usuario intenta navegar hacia atrás y lo
-        // redirige de vuelta al login.
-        window.addEventListener('popstate', function () {
-            window.location.replace('{{ route('login') }}');
-        });
+            // Prevenir que el navegador guarde esta página en caché
+            window.addEventListener('unload', function() {
+                if (window.history && window.history.forward) {
+                    window.history.forward(1);
+                }
+            });
+
+            // Headers ya están siendo enviados por el servidor, pero esto asegura caché local
+            if ('caches' in window) {
+                caches.keys().then(function(cacheNames) {
+                    cacheNames.forEach(function(cacheName) {
+                        caches.delete(cacheName);
+                    });
+                });
+            }
+        })();
 
         // ── Toggle visibilidad de contraseña ─────────────────────────
         function togglePwd() {

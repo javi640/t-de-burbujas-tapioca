@@ -29,7 +29,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 // ── Cajero ────────────────────────────────────────────────────
-Route::middleware(['auth', 'role:cajero'])->prefix('cajero')->name('cajero.')->group(function () {
+Route::middleware(['auth', 'role:cajero', 'no-cache'])->prefix('cajero')->name('cajero.')->group(function () {
     Route::get('/turno/abrir',           [ShiftController::class, 'showOpen'])->name('shift.open');
     Route::post('/turno/abrir',          [ShiftController::class, 'open']);
     Route::get('/turno/actual',          [ShiftController::class, 'current'])->name('shift.current');
@@ -41,7 +41,7 @@ Route::middleware(['auth', 'role:cajero'])->prefix('cajero')->name('cajero.')->g
 });
 
 // ── Admin ─────────────────────────────────────────────────────
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin', 'no-cache'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 

@@ -30,7 +30,11 @@ class AuthController extends Controller
             return redirect()->route('cajero.shift.open');
         }
 
-        return view('auth.login');
+        return view('auth.login')->withHeaders([
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma'        => 'no-cache',
+            'Expires'       => 'Sat, 01 Jan 2000 00:00:00 GMT',
+        ]);
     }
 
     public function login(LoginRequest $request): RedirectResponse
@@ -118,12 +122,7 @@ class AuthController extends Controller
     {
         $userId = Auth::id();
 
-        Auth::logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        // Auditoría de logout
+        // Auditoría de logout (antes de cerrar sesión)
         if ($userId) {
             AuditLog::create([
                 'user_id'    => $userId,
@@ -132,11 +131,19 @@ class AuthController extends Controller
             ]);
         }
 
-        return redirect()->route('login')
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Respuesta con headers anti-caché para evitar que se vea la página al presionar atrás
+        return redirect()
+            ->route('login')
             ->withHeaders([
-                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0, private',
                 'Pragma'        => 'no-cache',
                 'Expires'       => 'Sat, 01 Jan 2000 00:00:00 GMT',
-            ]);
+                'Surrogate-Control' => 'no-store',
+            ])
+            ->with('success', 'Sesión cerrada correctamente');
     }
 }

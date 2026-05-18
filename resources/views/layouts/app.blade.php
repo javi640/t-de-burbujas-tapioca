@@ -549,6 +549,29 @@
     </div>
 </div>
 
+<script>
+    // ──────────── SEGURIDAD: Prevenir acceso después del logout ──────────
+    // Evita que el usuario vea contenido autenticado al presionar atrás
+    (function() {
+        // Reemplaza el estado del historial para bloquear el botón atrás
+        window.history.replaceState(null, null, window.location.href);
+        
+        // Detecta cualquier intento de navegar hacia atrás
+        window.addEventListener('popstate', function() {
+            window.location.replace('{{ route('login') }}');
+        });
+
+        // Prevenir que el navegador guarde esta página en caché
+        if ('caches' in window) {
+            caches.keys().then(function(cacheNames) {
+                cacheNames.forEach(function(cacheName) {
+                    caches.delete(cacheName);
+                });
+            });
+        }
+    })();
+</script>
+
 @yield('scripts')
 @stack('scripts')
 </body>
