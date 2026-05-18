@@ -3,11 +3,11 @@
 
 @section('sidebar-nav')
     <span class="nav-section-label">Principal</span>
-    <a href="{{ route('admin.dashboard') }}" class="nav-item"><span class="nav-icon">⬡</span> Dashboard</a>
+    <a href="{{ route('admin.dashboard') }}" class="nav-item"><i class="bi bi-speedometer2"></i> Dashboard</a>
     <span class="nav-section-label">Gestión</span>
-    <a href="{{ route('admin.users.index') }}" class="nav-item"><span class="nav-icon">👥</span> Usuarios</a>
-    <a href="{{ route('admin.sales.index') }}" class="nav-item"><span class="nav-icon">🛒</span> Historial Ventas</a>
-    <a href="{{ route('admin.shifts.index') }}" class="nav-item active"><span class="nav-icon">⏱</span> Turnos</a>
+    <a href="{{ route('admin.users.index') }}" class="nav-item"><i class="bi bi-people-fill"></i> Usuarios</a>
+    <a href="{{ route('admin.sales.index') }}" class="nav-item"><i class="bi bi-bag-check"></i> Historial Ventas</a>
+    <a href="{{ route('admin.shifts.index') }}" class="nav-item active"><i class="bi bi-clock-history"></i> Turnos</a>
 @endsection
 
 @section('page-title', 'Turnos')
@@ -53,7 +53,7 @@
                             </span>
                         </td>
                         <td>
-                            <a href="{{ route('admin.shifts.show', $shift) }}" class="btn btn-ghost btn-sm">Ver</a>
+                            <a href="{{ route('admin.shifts.show', $shift) }}" class="btn btn-ghost btn-sm"><i class="bi bi-eye"></i> Ver</a>
                         </td>
                     </tr>
                 @empty

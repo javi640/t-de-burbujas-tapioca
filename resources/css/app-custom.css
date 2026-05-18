@@ -1,0 +1,318 @@
+/* 
+   ═══════════════════════════════════════════════════════════
+   Panda Naicha - Estilos Personalizados
+   Paleta de colores para tienda de tapioca
+   ═══════════════════════════════════════════════════════════
+*/
+
+:root {
+    --color-primary: #1D6A96;        /* Azul principal */
+    --color-secondary: #85B8CB;      /* Azul claro */
+    --color-light: #D1DDDB;          /* Gris claro */
+    --color-dark: #283B42;           /* Azul muy oscuro */
+    --color-success: #22c55e;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* BODY Y GENERAL */
+/* ═══════════════════════════════════════════════════════════ */
+
+body {
+    font-family: 'DM Sans', 'Segoe UI', sans-serif !important;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* SIDEBAR */
+/* ═══════════════════════════════════════════════════════════ */
+
+.sidebar {
+    background: linear-gradient(135deg, var(--color-dark) 0%, #1f2d35 100%) !important;
+    border-right: 3px solid var(--color-primary);
+}
+
+.sidebar .nav-item {
+    color: var(--color-light) !important;
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.sidebar .nav-item:hover {
+    background-color: rgba(129, 184, 203, 0.1) !important;
+    border-left-color: var(--color-secondary);
+    color: var(--color-light) !important;
+}
+
+.sidebar .nav-item.active {
+    background-color: rgba(29, 106, 150, 0.2) !important;
+    border-left-color: var(--color-secondary);
+    color: var(--color-light) !important;
+    font-weight: 600;
+}
+
+.sidebar .nav-section-label {
+    color: var(--color-secondary) !important;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.sidebar-logo {
+    border-bottom: 2px solid var(--color-primary);
+    background-color: rgba(29, 106, 150, 0.1);
+}
+
+.sidebar-logo .logo-text {
+    color: var(--color-light) !important;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.sidebar-logo .logo-sub {
+    color: var(--color-secondary) !important;
+    font-size: 0.75rem;
+}
+
+.sidebar-user {
+    border-top: 2px solid var(--color-primary);
+    background-color: rgba(29, 106, 150, 0.1);
+}
+
+.user-avatar {
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary)) !important;
+    color: white !important;
+    font-weight: 700;
+}
+
+.btn-logout {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--color-danger);
+    border: 1px solid var(--color-danger);
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    background-color: var(--color-danger);
+    color: white;
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* TOPBAR */
+/* ═══════════════════════════════════════════════════════════ */
+
+.topbar {
+    background-color: white;
+    border-bottom: 2px solid var(--color-light);
+    box-shadow: 0 2px 8px rgba(29, 106, 150, 0.1);
+}
+
+.page-title {
+    color: var(--color-dark) !important;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.page-subtitle {
+    color: var(--color-secondary) !important;
+    font-size: 0.9rem;
+}
+
+.badge-role {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* CARDS Y CONTENEDOR */
+/* ═══════════════════════════════════════════════════════════ */
+
+.card {
+    background-color: white;
+    border: 1px solid var(--color-light);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(29, 106, 150, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 16px rgba(29, 106, 150, 0.15);
+}
+
+.card h3 {
+    color: var(--color-dark);
+    border-bottom: 2px solid var(--color-secondary);
+    padding-bottom: 0.75rem;
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* BOTONES */
+/* ═══════════════════════════════════════════════════════════ */
+
+.btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-dark);
+    border-color: var(--color-dark);
+}
+
+.btn-secondary {
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-ghost {
+    color: var(--color-primary);
+    border: 1px solid var(--color-secondary);
+    background-color: transparent;
+}
+
+.btn-ghost:hover {
+    background-color: rgba(29, 106, 150, 0.1);
+    color: var(--color-dark);
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+}
+
+.btn-submit:hover {
+    background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-primary) 100%);
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* TABLAS */
+/* ═══════════════════════════════════════════════════════════ */
+
+table thead {
+    background-color: var(--color-dark);
+    color: white;
+}
+
+table thead th {
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 1rem;
+}
+
+table tbody tr {
+    border-bottom: 1px solid var(--color-light);
+    transition: background-color 0.3s ease;
+}
+
+table tbody tr:hover {
+    background-color: rgba(29, 106, 150, 0.05);
+}
+
+table tbody td {
+    padding: 1rem;
+    color: var(--color-dark);
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* BADGES */
+/* ═══════════════════════════════════════════════════════════ */
+
+.badge-success {
+    background-color: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.badge-warning {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-danger {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-gray {
+    background-color: rgba(139, 154, 191, 0.15);
+    color: var(--color-secondary);
+    border: 1px solid rgba(139, 154, 191, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* ALERTAS */
+/* ═══════════════════════════════════════════════════════════ */
+
+.alert-success {
+    background-color: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+}
+
+.alert-danger {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* INPUTS */
+/* ═══════════════════════════════════════════════════════════ */
+
+.form-control {
+    border: 1px solid var(--color-light);
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+}
+
+.form-control:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.2rem rgba(29, 106, 150, 0.25);
+}
+
+label {
+    color: var(--color-dark);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/* RESPONSIVE */
+/* ═══════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px !important;
+    }
+
+    .page-title {
+        font-size: 1.25rem;
+    }
+
+    .card {
+        margin-bottom: 1rem;
+    }
+}

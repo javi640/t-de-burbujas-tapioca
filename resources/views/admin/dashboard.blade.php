@@ -4,24 +4,24 @@
 @section('sidebar-nav')
     <span class="nav-section-label">Principal</span>
     <a href="{{ route('admin.dashboard') }}" class="nav-item active">
-        <span class="nav-icon">⬡</span> Dashboard
+        <i class="bi bi-speedometer2"></i> Dashboard
     </a>
     <span class="nav-section-label">Gestión</span>
     <a href="{{ route('admin.users.index') }}" class="nav-item">
-        <span class="nav-icon">👥</span> Usuarios
+        <i class="bi bi-people-fill"></i> Usuarios
     </a>
     <a href="{{ route('admin.sales.index') }}" class="nav-item">
-        <span class="nav-icon">🛒</span> Historial Ventas
+        <i class="bi bi-bag-check"></i> Historial Ventas
     </a>
     <a href="{{ route('admin.shifts.index') }}" class="nav-item">
-        <span class="nav-icon">⏱</span> Turnos
+        <i class="bi bi-clock-history"></i> Turnos
     </a>
     <span class="nav-section-label">Reportes</span>
     <a href="{{ route('admin.reports.daily') }}" class="nav-item">
-        <span class="nav-icon">📋</span> Cierre Diario
+        <i class="bi bi-file-earmark"></i> Cierre Diario
     </a>
     <a href="{{ route('admin.audit.index') }}" class="nav-item">
-        <span class="nav-icon">🔍</span> Auditoría
+        <i class="bi bi-search"></i> Auditoría
     </a>
 @endsection
 
@@ -35,7 +35,7 @@
     <span id="live-clock" class="text-xs text-muted mono"></span>
 
     {{-- ── Selector Hoy / Esta semana ── --}}
-    <div style="display:flex; gap:.35rem; background:rgba(42,53,72,.5); border:1px solid var(--border); border-radius:8px; padding:.25rem;">
+    <div style="display:flex; gap:.35rem; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:.25rem;">
         <a href="{{ route('admin.dashboard', ['modo' => 'hoy']) }}"
            style="padding:.3rem .75rem; border-radius:6px; font-size:.78rem; font-weight:600; text-decoration:none;
                   {{ $mode === 'hoy' ? 'background:var(--accent); color:#fff;' : 'color:var(--muted);' }}">
@@ -56,31 +56,31 @@
 {{-- ── 1. Tarjetas métricas ─────────────────────────────────────── --}}
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-icon">⏱</div>
+        <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
         <div class="stat-label">Turnos Abiertos</div>
         <div class="stat-value">{{ $openShifts }}</div>
         <div class="stat-note">en este momento</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">🛒</div>
+        <div class="stat-icon"><i class="bi bi-bag-check"></i></div>
         <div class="stat-label">Ventas {{ ucfirst($label) }}</div>
         <div class="stat-value">{{ $todaySalesCount }}</div>
         <div class="stat-note">transacciones completadas</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">💵</div>
+        <div class="stat-icon"><i class="bi bi-cash-coin"></i></div>
         <div class="stat-label">Total Efectivo</div>
         <div class="stat-value mono">Bs {{ number_format($todayCash, 2) }}</div>
         <div class="stat-note">recaudado {{ $label }}</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">📱</div>
+        <div class="stat-icon"><i class="bi bi-phone"></i></div>
         <div class="stat-label">Total QR</div>
         <div class="stat-value mono text-accent">Bs {{ number_format($todayQr, 2) }}</div>
         <div class="stat-note">recaudado {{ $label }}</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">💰</div>
+        <div class="stat-icon"><i class="bi bi-wallet"></i></div>
         <div class="stat-label">Total General</div>
         <div class="stat-value mono text-success">Bs {{ number_format($todayTotal, 2) }}</div>
         <div class="stat-note">efectivo + QR</div>
@@ -117,7 +117,7 @@
                     $hasData = $item['total'] > 0;
                     $bgColor = $isNow
                         ? 'var(--accent)'
-                        : ($hasData ? 'rgba(79,142,247,0.45)' : 'rgba(42,53,72,0.4)');
+                        : ($hasData ? 'rgba(133,184,203,0.35)' : 'rgba(184,204,202,0.3)');
                 @endphp
                 <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;"
                      title="{{ $item['label'] }} — Bs {{ number_format($item['total'], 2) }} ({{ $item['count'] }} ventas)">
@@ -161,7 +161,7 @@
                 $shiftCount = $shift->sales->where('status', 'COMPLETED')->count();
                 $duration   = $shift->start_time->diffForHumans(null, true);
             @endphp
-            <div style="padding:.75rem; background:rgba(79,142,247,.05); border-radius:8px; border:1px solid var(--border); margin-bottom:.75rem;">
+            <div style="padding:.75rem; background:rgba(133,184,203,.08); border-radius:8px; border:1px solid var(--border); margin-bottom:.75rem;">
                 <div class="flex items-center gap-3" style="margin-bottom:.5rem;">
                     <div class="user-avatar" style="background:var(--success);">
                         {{ strtoupper(substr($shift->user->name, 0, 2)) }}
@@ -176,13 +176,13 @@
                     </div>
                 </div>
                 <div class="flex gap-3" style="font-size:.72rem; color:var(--muted);">
-                    <span>💵 Bs {{ number_format($shiftCash, 2) }}</span>
-                    <span>📱 Bs {{ number_format($shiftQr, 2) }}</span>
+                    <span><i class="bi bi-cash-coin" style="font-size:.8rem; margin-right:.35rem;"></i>Bs {{ number_format($shiftCash, 2) }}</span>
+                    <span><i class="bi bi-phone" style="font-size:.8rem; margin-right:.35rem;"></i>Bs {{ number_format($shiftQr, 2) }}</span>
                 </div>
             </div>
         @empty
             <div class="text-center text-muted" style="padding:2rem 0;">
-                <div style="font-size:2rem; margin-bottom:.5rem;">⏸</div>
+                <div style="font-size:2rem; margin-bottom:.5rem;"><i class="bi bi-pause-circle" style="font-size:2rem;"></i></div>
                 <div>No hay turnos abiertos</div>
             </div>
         @endforelse
@@ -215,8 +215,8 @@
                         <div style="height:100%; width:{{ $pct }}%; background:var(--accent); border-radius:3px;"></div>
                     </div>
                     <div class="flex gap-3" style="font-size:.72rem; color:var(--muted); margin-top:.25rem;">
-                        <span>💵 Bs {{ number_format($row->cash_total, 2) }}</span>
-                        <span>📱 Bs {{ number_format($row->qr_total, 2) }}</span>
+                        <span><i class="bi bi-cash-coin" style="font-size:.8rem; margin-right:.35rem;"></i>Bs {{ number_format($row->cash_total, 2) }}</span>
+                        <span><i class="bi bi-phone" style="font-size:.8rem; margin-right:.35rem;"></i>Bs {{ number_format($row->qr_total, 2) }}</span>
                         <span>{{ $row->sale_count }} ventas</span>
                     </div>
                 </div>
@@ -237,7 +237,7 @@
                 @php $pct = round(($product->units_sold / $maxUnits) * 100); @endphp
                 <div style="margin-bottom:.85rem;">
                     <div class="flex items-center gap-2" style="margin-bottom:.25rem;">
-                        <span class="mono" style="font-size:.7rem; width:1.4rem; height:1.4rem; display:flex; align-items:center; justify-content:center; background:rgba(79,142,247,.12); border-radius:50%; color:var(--accent); font-weight:700; flex-shrink:0;">{{ $i + 1 }}</span>
+                        <span class="mono" style="font-size:.7rem; width:1.4rem; height:1.4rem; display:flex; align-items:center; justify-content:center; background:rgba(133,184,203,.15); border-radius:50%; color:var(--accent); font-weight:700; flex-shrink:0;">{{ $i + 1 }}</span>
                         <span class="text-sm font-bold" style="flex:1;">{{ $product->name }}</span>
                         <span class="mono text-xs text-muted">{{ $product->units_sold }} u.</span>
                         <span class="mono text-sm text-success">Bs {{ number_format($product->revenue, 2) }}</span>

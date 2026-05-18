@@ -4,13 +4,13 @@
 @section('sidebar-nav')
     <span class="nav-section-label">Mi Turno</span>
     <a href="{{ route('cajero.shift.current') }}" class="nav-item active">
-        <span class="nav-icon">⏱</span> Turno Actual
+        <i class="bi bi-clock-history"></i> Turno Actual
     </a>
     <a href="{{ route('cajero.sales.create') }}" class="nav-item">
-        <span class="nav-icon">🛒</span> Nueva Venta
+        <i class="bi bi-bag-check"></i> Nueva Venta
     </a>
     <a href="javascript:void(0)" onclick="document.getElementById('movements').scrollIntoView({behavior:'smooth'})" class="nav-item">
-        <span class="nav-icon">💰</span> Movimientos
+        <i class="bi bi-wallet"></i> Movimientos
     </a>
 @endsection
 
@@ -22,28 +22,28 @@
 @endsection
 
 @section('topbar-actions')
-    <button type="button" onclick="showCloseModal()" class="btn btn-danger btn-sm">🔒 Cerrar Turno</button>
+    <button type="button" onclick="showCloseModal()" class="btn btn-danger btn-sm"><i class="bi bi-lock-fill"></i> Cerrar Turno</button>
 @endsection
 
 @section('content')
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-icon">💵</div>
+        <div class="stat-icon"><i class="bi bi-cash-coin"></i></div>
         <div class="stat-label">Efectivo Esperado</div>
         <div class="stat-value mono">Bs {{ number_format($expectedCash, 2) }}</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">📱</div>
+        <div class="stat-icon"><i class="bi bi-phone"></i></div>
         <div class="stat-label">Total QR</div>
         <div class="stat-value mono text-accent">Bs {{ number_format($totalQr, 2) }}</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">🛒</div>
+        <div class="stat-icon"><i class="bi bi-bag-check"></i></div>
         <div class="stat-label">Ventas del Turno</div>
         <div class="stat-value">{{ $shift->sales->count() }}</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">💸</div>
+        <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
         <div class="stat-label">Efectivo Inicial</div>
         <div class="stat-value mono">Bs {{ number_format($shift->initial_cash, 2) }}</div>
     </div>
@@ -53,11 +53,11 @@
     {{-- Stock restante --}}
     <div class="card">
         <div class="card-header">
-            <div class="card-title">📦 Stock Restante</div>
+            <div class="card-title"><i class="bi bi-box"></i> Stock Restante</div>
             <a href="{{ route('cajero.sales.create') }}" class="btn btn-primary btn-sm">+ Nueva Venta</a>
         </div>
         @foreach($shift->stock as $stock)
-            <div class="flex items-center gap-3" style="padding: .6rem 0; border-bottom: 1px solid rgba(42,53,72,.5);">
+            <div class="flex items-center gap-3" style="padding: .6rem 0; border-bottom: 1px solid rgba(184,204,202,.5);">
                 <div style="flex: 1;">
                     <div class="text-sm font-bold">{{ $stock->product->name }}</div>
                     <div class="text-xs text-muted">Inicial: {{ $stock->initial_quantity }}</div>
@@ -75,10 +75,10 @@
     {{-- Últimas ventas --}}
     <div class="card">
         <div class="card-header">
-            <div class="card-title">🛒 Ventas del Turno</div>
+            <div class="card-title"><i class="bi bi-bag-check"></i> Ventas del Turno</div>
         </div>
         @forelse($shift->sales->take(8) as $sale)
-            <div class="flex items-center gap-3" style="padding: .5rem 0; border-bottom: 1px solid rgba(42,53,72,.4);">
+            <div class="flex items-center gap-3" style="padding: .5rem 0; border-bottom: 1px solid rgba(184,204,202,.4);">
                 <span class="{{ $sale->payment_method === 'CASH' ? 'badge badge-success' : 'badge badge-info' }}">
                     {{ $sale->payment_method === 'CASH' ? 'EF' : 'QR' }}
                 </span>
@@ -96,7 +96,7 @@
 {{-- Movimientos extra --}}
 <div class="card mt-4" id="movements">
     <div class="card-header">
-        <div class="card-title">💰 Registrar Movimiento</div>
+        <div class="card-title"><i class="bi bi-wallet"></i> Registrar Movimiento</div>
         <div class="card-subtitle">Ingresos o egresos extras de caja</div>
     </div>
     <form method="POST" action="{{ route('cajero.movements.store') }}">
@@ -122,7 +122,7 @@
 {{-- ✅ FIX 2: Modal con display:none SOLAMENTE, sin el segundo display:flex --}}
 <div id="closeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:999; align-items:center; justify-content:center;">
     <div class="card" style="max-width:440px; width:90%;">
-        <div class="card-title mb-4">🔒 Cerrar Turno</div>
+        <div class="card-title mb-4"><i class="bi bi-lock-fill"></i> Cerrar Turno</div>
         <form method="POST" action="{{ route('cajero.shift.close') }}">
             @csrf
             <div class="form-group">

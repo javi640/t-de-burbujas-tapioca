@@ -3,14 +3,14 @@
 
 @section('sidebar-nav')
     <span class="nav-section-label">Principal</span>
-    <a href="{{ route('admin.dashboard') }}" class="nav-item"><span class="nav-icon">⬡</span> Dashboard</a>
+    <a href="{{ route('admin.dashboard') }}" class="nav-item"><i class="bi bi-speedometer2"></i> Dashboard</a>
     <span class="nav-section-label">Gestión</span>
-    <a href="{{ route('admin.users.index') }}" class="nav-item"><span class="nav-icon">👥</span> Usuarios</a>
-    <a href="{{ route('admin.sales.index') }}" class="nav-item"><span class="nav-icon">🛒</span> Historial Ventas</a>
-    <a href="{{ route('admin.shifts.index') }}" class="nav-item"><span class="nav-icon">⏱</span> Turnos</a>
+    <a href="{{ route('admin.users.index') }}" class="nav-item"><i class="bi bi-people-fill"></i> Usuarios</a>
+    <a href="{{ route('admin.sales.index') }}" class="nav-item"><i class="bi bi-bag-check"></i> Historial Ventas</a>
+    <a href="{{ route('admin.shifts.index') }}" class="nav-item"><i class="bi bi-clock-history"></i> Turnos</a>
     <span class="nav-section-label">Reportes</span>
-    <a href="{{ route('admin.reports.daily') }}" class="nav-item"><span class="nav-icon">📋</span> Cierre Diario</a>
-    <a href="{{ route('admin.audit.index') }}" class="nav-item active"><span class="nav-icon">🔍</span> Auditoría</a>
+    <a href="{{ route('admin.reports.daily') }}" class="nav-item"><i class="bi bi-file-earmark"></i> Cierre Diario</a>
+    <a href="{{ route('admin.audit.index') }}" class="nav-item active"><i class="bi bi-search"></i> Auditoría</a>
 @endsection
 
 @section('page-title', 'Auditoría')
@@ -20,18 +20,18 @@
 @endsection
 
 @section('topbar-actions')
-    <button onclick="window.print()" class="btn btn-ghost btn-sm">🖨 Imprimir</button>
+    <button onclick="window.print()" class="btn btn-ghost btn-sm"><i class="bi bi-printer"></i> Imprimir</button>
 @endsection
 
 @section('content')
 
 @php
     $actionLabels = [
-        'login'       => ['Inicios de sesión',  '🔑'],
-        'logout'      => ['Cierres de sesión',   '🚪'],
-        'open_shift'  => ['Aperturas de turno',  '▶'],
-        'close_shift' => ['Cierres de turno',    '■'],
-        'void_sale'   => ['Anulaciones',          '⚠'],
+        'login'       => ['Inicios de sesión',  '<i class="bi bi-key"></i>'],
+        'logout'      => ['Cierres de sesión',   '<i class="bi bi-door-closed"></i>'],
+        'open_shift'  => ['Aperturas de turno',  '<i class="bi bi-play-circle"></i>'],
+        'close_shift' => ['Cierres de turno',    '<i class="bi bi-stop-circle"></i>'],
+        'void_sale'   => ['Anulaciones',          '<i class="bi bi-exclamation-triangle"></i>'],
     ];
 
     // Clases CSS predefinidas para cada acción — evita variables dentro de style=""
@@ -57,7 +57,7 @@
 <div class="stats-grid" style="grid-template-columns: repeat(5, 1fr); margin-bottom: 1rem;">
     @foreach($actionLabels as $key => [$label, $icon])
         <div class="stat-card" style="text-align:center;">
-            <div style="font-size:1.3rem; margin-bottom:.25rem;">{{ $icon }}</div>
+            <div style="font-size:1.3rem; margin-bottom:.25rem;">{!! $icon !!}</div>
             <div class="stat-label" style="font-size:.68rem;">{{ $label }}</div>
             {{-- Usamos variable PHP para el estilo, no interpolación dentro de style="" --}}
             <div class="stat-value mono" style="font-size:1.4rem; {{ $actionCountStyle[$key] ?? '' }}">
@@ -211,7 +211,7 @@
                         {{-- Fila expandible con old/new values --}}
                         @if($log->old_values || $log->new_values)
                             <tr id="detail-{{ $log->id }}" style="display:none;">
-                                <td colspan="6" style="padding:.5rem 1rem 1rem; background:rgba(10,15,30,.3);">
+                                <td colspan="6" style="padding:.5rem 1rem 1rem; background:rgba(184,204,202,.15);">
                                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
 
                                         @if($log->old_values)

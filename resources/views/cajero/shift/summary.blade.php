@@ -5,11 +5,11 @@
     <span class="nav-section-label">Mi Turno</span>
     @if(auth()->user()->isAdmin())
         <a href="{{ route('admin.shifts.index') }}" class="nav-item">
-            <span class="nav-icon">⏱</span> Ver Turnos
+            <i class="bi bi-clock-history"></i> Ver Turnos
         </a>
     @else
         <a href="{{ route('cajero.shift.open') }}" class="nav-item">
-            <span class="nav-icon">🔓</span> Abrir Turno
+            <i class="bi bi-unlock"></i> Abrir Turno
         </a>
     @endif
 @endsection

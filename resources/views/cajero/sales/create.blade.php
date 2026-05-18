@@ -4,13 +4,13 @@
 @section('sidebar-nav')
     <span class="nav-section-label">Mi Turno</span>
     <a href="{{ route('cajero.shift.current') }}" class="nav-item">
-        <span class="nav-icon">⏱</span> Turno Actual
+        <i class="bi bi-clock-history"></i> Turno Actual
     </a>
     <a href="{{ route('cajero.sales.create') }}" class="nav-item active">
-        <span class="nav-icon">🛒</span> Nueva Venta
+        <i class="bi bi-bag-check"></i> Nueva Venta
     </a>
     <a href="{{ route('cajero.shift.current') }}#movements" class="nav-item">
-        <span class="nav-icon">💰</span> Movimientos
+        <i class="bi bi-wallet"></i> Movimientos
     </a>
 @endsection
 
@@ -22,12 +22,12 @@
     {{-- Productos disponibles --}}
     <div class="card">
         <div class="card-header">
-            <div class="card-title">📦 Productos Disponibles</div>
+            <div class="card-title"><i class="bi bi-box"></i> Productos Disponibles</div>
         </div>
         <div id="products-list">
             @forelse($stockItems as $stock)
                 <div class="flex items-center gap-3"
-                    style="padding: .75rem; margin-bottom: .5rem; background: rgba(79,142,247,.04); border-radius: 8px; border: 1px solid var(--border); cursor: pointer;"
+                    style="padding: .75rem; margin-bottom: .5rem; background: rgba(133,184,203,.08); border-radius: 8px; border: 1px solid var(--border); cursor: pointer;"
                     data-id="{{ $stock->product->id }}"
                     data-name="{{ $stock->product->name }}"
                     data-price="{{ $stock->product->price }}"
@@ -42,7 +42,7 @@
                 </div>
             @empty
                 <div class="text-center text-muted" style="padding: 3rem 0;">
-                    <div style="font-size: 2rem; margin-bottom: .5rem;">📭</div>
+                    <div style="font-size: 2rem; margin-bottom: .5rem;"><i class="bi bi-inbox" style="font-size:2rem;"></i></div>
                     <div>No hay productos con stock disponible</div>
                 </div>
             @endforelse
@@ -52,7 +52,7 @@
     {{-- Carrito --}}
     <div class="card" style="position: sticky; top: 1rem;">
         <div class="card-header">
-            <div class="card-title">🛒 Carrito de Venta</div>
+            <div class="card-title"><i class="bi bi-bag-check"></i> Carrito de Venta</div>
             <button type="button" onclick="clearCart()" class="btn btn-ghost btn-sm">Limpiar</button>
         </div>
 
@@ -77,17 +77,17 @@
                 <div class="flex gap-3">
                     <label style="flex:1; text-transform:none; letter-spacing:0; cursor:pointer;">
                         <input type="radio" name="payment_method" value="CASH" checked style="width:auto; margin-right:.5rem;">
-                        <span style="font-size:.9rem;">💵 Efectivo</span>
+                        <span style="font-size:.9rem;"><i class="bi bi-cash-coin" style="margin-right:.3rem;"></i>Efectivo</span>
                     </label>
                     <label style="flex:1; text-transform:none; letter-spacing:0; cursor:pointer;">
                         <input type="radio" name="payment_method" value="QR" style="width:auto; margin-right:.5rem;">
-                        <span style="font-size:.9rem;">📱 QR</span>
+                        <span style="font-size:.9rem;"><i class="bi bi-phone" style="margin-right:.3rem;"></i>QR</span>
                     </label>
                 </div>
             </div>
 
             <button type="button" onclick="submitSale()" class="btn btn-primary w-full" style="padding: .875rem; font-size: 1rem;">
-                ✓ Confirmar Venta
+                <i class="bi bi-check-circle"></i> Confirmar Venta
             </button>
         </form>
     </div>
@@ -149,7 +149,7 @@ function renderCart() {
         const sub = item.price * item.qty;
         total += sub;
         html += `
-            <div class="flex items-center gap-2" style="padding: .5rem 0; border-bottom: 1px solid rgba(42,53,72,.4);">
+            <div class="flex items-center gap-2" style="padding: .5rem 0; border-bottom: 1px solid rgba(184,204,202,.4);">
                 <div style="flex:1">
                     <div class="text-sm font-bold">${item.name}</div>
                     <div class="text-xs text-muted mono">Bs ${item.price.toFixed(2)} c/u</div>

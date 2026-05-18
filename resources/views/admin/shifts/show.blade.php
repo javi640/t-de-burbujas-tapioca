@@ -3,18 +3,18 @@
 
 @section('sidebar-nav')
     <span class="nav-section-label">Principal</span>
-    <a href="{{ route('admin.dashboard') }}" class="nav-item"><span class="nav-icon">⬡</span> Dashboard</a>
+    <a href="{{ route('admin.dashboard') }}" class="nav-item"><i class="bi bi-speedometer2"></i> Dashboard</a>
     <span class="nav-section-label">Gestión</span>
-    <a href="{{ route('admin.users.index') }}" class="nav-item"><span class="nav-icon">👥</span> Usuarios</a>
-    <a href="{{ route('admin.sales.index') }}" class="nav-item"><span class="nav-icon">🛒</span> Historial Ventas</a>
-    <a href="{{ route('admin.shifts.index') }}" class="nav-item active"><span class="nav-icon">⏱</span> Turnos</a>
+    <a href="{{ route('admin.users.index') }}" class="nav-item"><i class="bi bi-people-fill"></i> Usuarios</a>
+    <a href="{{ route('admin.sales.index') }}" class="nav-item"><i class="bi bi-bag-check"></i> Historial Ventas</a>
+    <a href="{{ route('admin.shifts.index') }}" class="nav-item active"><i class="bi bi-clock-history"></i> Turnos</a>
 @endsection
 
 @section('page-title', 'Detalle del Turno')
 @section('page-subtitle', 'Información completa del turno #' . $shift->id)
 
 @section('topbar-actions')
-    <a href="{{ route('admin.shifts.index') }}" class="btn btn-ghost">← Volver</a>
+    <a href="{{ route('admin.shifts.index') }}" class="btn btn-ghost"><i class="bi bi-arrow-left"></i> Volver</a>
 @endsection
 
 @section('content')
@@ -22,7 +22,7 @@
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
     <!-- Info General -->
     <div class="card">
-        <h3 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600;">📋 Información General</h3>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600;"><i class="bi bi-info-circle"></i> Información General</h3>
         <div style="display: grid; gap: .75rem; font-size: .9rem;">
             <div style="display: grid; grid-template-columns: 1fr 1fr;">
                 <span style="color: #8b9abf;">Cajero:</span>
@@ -49,7 +49,7 @@
 
     <!-- Caja -->
     <div class="card">
-        <h3 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600;">💰 Efectivo</h3>
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600;"><i class="bi bi-cash-coin"></i> Efectivo</h3>
         <div style="display: grid; gap: .75rem; font-size: .9rem;">
             <div style="display: grid; grid-template-columns: 1fr 1fr;">
                 <span style="color: #8b9abf;">Inicial:</span>
@@ -75,7 +75,7 @@
 
 <!-- Resumen de Ventas -->
 <div class="card" style="margin-bottom: 2rem;">
-    <h3 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600;">🛒 Resumen de Ventas</h3>
+    <h3 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600;"><i class="bi bi-bag-check"></i> Resumen de Ventas</h3>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
         <div style="background: #131929; padding: 1rem; border-radius: 8px; border: 1px solid #2a3548;">
             <div style="font-size: .8rem; color: #8b9abf; margin-bottom: .3rem;">Total Ventas</div>
@@ -107,7 +107,7 @@
 <!-- Movimientos de Caja -->
 @if($shift->cashMovements->count() > 0)
 <div class="card" style="margin-bottom: 2rem;">
-    <h3 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600;">📝 Movimientos de Caja</h3>
+    <h3 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600;"><i class="bi bi-clipboard-data"></i> Movimientos de Caja</h3>
     <div class="table-wrap">
         <table>
             <thead>
@@ -124,7 +124,7 @@
                     <tr>
                         <td>
                             <span class="badge {{ $movement->movement_type === 'INCOME' ? 'badge-success' : 'badge-danger' }}">
-                                {{ $movement->movement_type === 'INCOME' ? '➕ Ingreso' : '➖ Egreso' }}
+                                {{ $movement->movement_type === 'INCOME' ? '<i class="bi bi-arrow-down"></i> Ingreso' : '<i class="bi bi-arrow-up"></i> Egreso' }}
                             </span>
                         </td>
                         <td>{{ $movement->category ?? '—' }}</td>
@@ -142,7 +142,7 @@
 <!-- Stock Inicial -->
 @if($shift->stock->count() > 0)
 <div class="card">
-    <h3 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600;">📦 Stock Inicial del Turno</h3>
+    <h3 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600;"><i class="bi bi-boxes"></i> Stock Inicial del Turno</h3>
     <div class="table-wrap">
         <table>
             <thead>

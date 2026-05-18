@@ -4,13 +4,13 @@
 
 @section('sidebar-nav')
     <span class="nav-section-label">Principal</span>
-    <a href="{{ route('admin.dashboard') }}" class="nav-item"><span class="nav-icon">⬡</span> Dashboard</a>
+    <a href="{{ route('admin.dashboard') }}" class="nav-item"><i class="bi bi-speedometer2"></i> Dashboard</a>
     <span class="nav-section-label">Gestión</span>
-    <a href="{{ route('admin.users.index') }}" class="nav-item"><span class="nav-icon">👥</span> Usuarios</a>
-    <a href="{{ route('admin.sales.index') }}" class="nav-item"><span class="nav-icon">🛒</span> Historial Ventas</a>
-    <a href="{{ route('admin.shifts.index') }}" class="nav-item"><span class="nav-icon">⏱</span> Turnos</a>
+    <a href="{{ route('admin.users.index') }}" class="nav-item"><i class="bi bi-people-fill"></i> Usuarios</a>
+    <a href="{{ route('admin.sales.index') }}" class="nav-item"><i class="bi bi-bag-check"></i> Historial Ventas</a>
+    <a href="{{ route('admin.shifts.index') }}" class="nav-item"><i class="bi bi-clock-history"></i> Turnos</a>
     <span class="nav-section-label">Reportes</span>
-    <a href="{{ route('admin.reports.daily') }}" class="nav-item active"><span class="nav-icon">📋</span> Cierre Diario</a>
+    <a href="{{ route('admin.reports.daily') }}" class="nav-item active"><i class="bi bi-file-earmark"></i> Cierre Diario</a>
 @endsection
 
 @section('page-title', 'Reporte de Cierre Diario')
@@ -29,7 +29,7 @@
         <button type="submit" class="btn btn-primary btn-sm">Ver</button>
     </form>
     {{-- Botón imprimir --}}
-    <button onclick="window.print()" class="btn btn-ghost btn-sm">🖨 Imprimir</button>
+    <button onclick="window.print()" class="btn btn-ghost btn-sm"><i class="bi bi-printer"></i> Imprimir</button>
 @endsection
 
 @section('content')
@@ -37,7 +37,7 @@
 @if($shifts->isEmpty())
     {{-- ── Sin datos para la fecha ──────────────────────────────── --}}
     <div class="card" style="text-align:center; padding:3rem;">
-        <div style="font-size:2.5rem; margin-bottom:1rem;">📋</div>
+        <div style="font-size:2.5rem; margin-bottom:1rem;"><i class="bi bi-file-earmark" style="font-size:2.5rem;"></i></div>
         <div class="card-title" style="margin-bottom:.5rem;">Sin turnos cerrados</div>
         <div class="text-muted">No hay turnos cerrados registrados para el {{ $date->format('d/m/Y') }}.</div>
         <div class="text-muted text-sm" style="margin-top:.5rem;">Seleccioná otra fecha en el selector de arriba.</div>
@@ -112,7 +112,7 @@
     </div>
 
     {{-- Diagrama del árbol de decisiones (visual) --}}
-    <div style="background:rgba(10,15,30,.4); border-radius:10px; padding:1.25rem; border:1px solid var(--border);">
+    <div style="background:rgba(184,204,202,.2); border-radius:10px; padding:1.25rem; border:1px solid var(--border);">
         <div style="font-size:.7rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:1rem;">
             Lógica del árbol aplicada
         </div>
@@ -251,7 +251,7 @@
                         </div>
                     </div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:.5rem;">
-                        <div style="background:rgba(10,15,30,.4); border-radius:8px; padding:.75rem; border:1px solid rgba(79,142,247,.2);">
+                        <div style="background:rgba(184,204,202,.2); border-radius:8px; padding:.75rem; border:1px solid rgba(133,184,203,.3);">
                             <div style="font-size:.65rem; color:var(--muted); margin-bottom:.25rem;">Esperado</div>
                             <div class="mono text-accent" style="font-size:1.1rem; font-weight:700;">Bs {{ number_format($expected, 2) }}</div>
                         </div>
@@ -261,7 +261,7 @@
                         </div>
                     </div>
                     {{-- Diferencia destacada --}}
-                    <div style="margin-top:.5rem; padding:.6rem .75rem; border-radius:8px; background:rgba(10,15,30,.3); border:1px solid {{ $borderColor }}; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="margin-top:.5rem; padding:.6rem .75rem; border-radius:8px; background:rgba(184,204,202,.15); border:1px solid {{ $borderColor }}; display:flex; justify-content:space-between; align-items:center;">
                         <span style="font-size:.75rem; color:var(--muted);">Diferencia ({{ $decision['type'] }})</span>
                         <span class="mono" style="font-size:1rem; font-weight:700; color:var(--{{ $decision['color'] }});">
                             Bs {{ number_format($shift->cash_difference, 2) }}
@@ -274,7 +274,7 @@
                     <div style="font-size:.68rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:.75rem;">Decisión del árbol</div>
 
                     {{-- Recorrido del árbol para este turno --}}
-                    <div style="background:rgba(10,15,30,.4); border-radius:8px; padding:.85rem; margin-bottom:.75rem; font-family:'DM Mono',monospace; font-size:.72rem; line-height:1.9;">
+                    <div style="background:rgba(184,204,202,.2); border-radius:8px; padding:.85rem; margin-bottom:.75rem; font-family:'DM Mono',monospace; font-size:.72rem; line-height:1.9;">
                         @foreach($decision['decision_path'] as $pregunta => $respuesta)
                             <div>
                                 <span style="color:var(--muted);">{{ $pregunta }}</span>
@@ -344,7 +344,7 @@
                             </thead>
                             <tbody>
                                 @foreach($shift->sales as $sale)
-                                    <tr style="border-bottom:1px solid rgba(42,53,72,.4);">
+                                    <tr style="border-bottom:1px solid rgba(184,204,202,.4);">
                                         <td style="padding:.5rem .75rem;" class="mono text-xs">{{ $sale->sale_time->format('H:i') }}</td>
                                         <td style="padding:.5rem .75rem;" class="text-xs text-muted">
                                             {{ $sale->details->map(fn($d) => $d->quantity.'× '.$d->product->name)->join(', ') }}
