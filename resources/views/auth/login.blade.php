@@ -7,7 +7,8 @@
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Panda Naicha — Login</title>
+    <link rel="shortcut icon" href="{{ asset('images/logo.png') }}"/>
+    <title>Panda Naicha_Login</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 

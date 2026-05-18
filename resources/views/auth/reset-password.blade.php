@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ asset('images/logo.png') }}"/>
     <title>Nueva Contraseña — Panda Naicha</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -38,7 +39,6 @@
             object-fit: contain;
             display: block;
             margin: 0 auto 1rem;
-        
             font-size: 1.4rem;
             font-weight: 700;
             text-align: center;
