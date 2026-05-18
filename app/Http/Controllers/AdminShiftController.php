@@ -18,13 +18,19 @@ class AdminShiftController extends Controller
 
     public function show(Shift $shift): View
     {
-        // Carga todas las relaciones necesarias para el detalle completo
+        // Carga las relaciones de forma más eficiente
         $shift->load([
             'user',
-            'sales.details.product',
-            'sales.voidedBy',
+            'sales' => function ($query) {
+                $query->with('details.product', 'voidedBy')
+                    ->orderBy('created_at', 'desc')
+                    ->limit(100); // Limita a evitar timeout
+            },
             'stock.product',
-            'cashMovements',
+            'cashMovements' => function ($query) {
+                $query->orderBy('created_at', 'desc')
+                    ->limit(100);
+            },
         ]);
 
         return view('admin.shifts.show', compact('shift'));
