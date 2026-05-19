@@ -4,33 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <link rel="shortcut icon" href="{{ asset('images/logo.png') }}"/>
-    <title>@yield('title', 'Panda Naicha') — Sistema de Gestión</title>
 
+    <title>@yield('title', 'Panda Naicha') — Sistema de Gestión</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg:        #D1DDDB;
-            --surface:   #e8efee;
-            --card:      #ffffff;
-            --border:    #b8ccca;
-            --accent:    #1D6A96;
-            --accent-h:  #155578;
-            --secondary: #85B8CB;
-            --success:   #2d8a5e;
-            --warning:   #c97c10;
-            --danger:    #c0392b;
-            --text:      #283B42;
-            --muted:     #5d7d84;
+            --bg:        #0b0f1a;
+            --surface:   #131929;
+            --card:      #1a2235;
+            --border:    #2a3548;
+            --accent:    #4f8ef7;
+            --accent-h:  #3a7de8;
+            --success:   #22c55e;
+            --warning:   #f59e0b;
+            --danger:    #ef4444;
+            --text:      #f0f4ff;
+            --muted:     #8b9abf;
             --sidebar-w: 240px;
         }
 
@@ -45,45 +41,40 @@
         /* ── Sidebar ─────────────────────────────── */
         .sidebar {
             width: var(--sidebar-w);
-            background: var(--accent);
+            background: var(--surface);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             position: fixed;
             top: 0; left: 0; bottom: 0;
             z-index: 100;
             overflow-y: auto;
-            box-shadow: 2px 0 8px rgba(29, 106, 150, 0.15);
         }
 
         .sidebar-logo {
-            padding: 1.4rem 1.25rem;
-            border-bottom: 1px solid rgba(255,255,255,.15);
+            padding: 1.5rem 1.25rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: .75rem;
         }
 
         .sidebar-logo .logo-icon {
-            width: 46px;
-            height: 46px;
-            object-fit: contain;
-            flex-shrink: 0;
-            border-radius: 50%;
-            background: var(--bg);
-            padding: 4px;
+            font-size: 1.75rem;
+            line-height: 1;
         }
 
         .sidebar-logo .logo-text {
             font-family: 'DM Mono', monospace;
-            font-size: .82rem;
+            font-size: .85rem;
             font-weight: 500;
-            color: #fff;
+            color: var(--text);
             line-height: 1.3;
         }
 
         .sidebar-logo .logo-sub {
-            font-size: .68rem;
-            color: rgba(255,255,255,.6);
+            font-size: .7rem;
+            color: var(--muted);
             font-family: 'DM Sans', sans-serif;
         }
 
@@ -93,11 +84,11 @@
         }
 
         .nav-section-label {
-            font-size: .63rem;
+            font-size: .65rem;
             font-weight: 600;
             letter-spacing: .1em;
             text-transform: uppercase;
-            color: rgba(255,255,255,.45);
+            color: var(--muted);
             padding: .75rem 1.25rem .25rem;
         }
 
@@ -106,7 +97,7 @@
             align-items: center;
             gap: .75rem;
             padding: .6rem 1.25rem;
-            color: rgba(255,255,255,.7);
+            color: var(--muted);
             text-decoration: none;
             font-size: .875rem;
             font-weight: 500;
@@ -116,20 +107,16 @@
 
         .nav-item:hover,
         .nav-item.active {
-            color: #fff;
-            background: rgba(255,255,255,.12);
-            border-left-color: var(--bg);
+            color: var(--text);
+            background: rgba(79,142,247,.08);
+            border-left-color: var(--accent);
         }
 
-        .nav-item i {
-            font-size: 1.05rem;
-            width: 1.25rem;
-            text-align: center;
-        }
+        .nav-item .nav-icon { font-size: 1rem; width: 1.25rem; text-align: center; }
 
         .sidebar-user {
             padding: 1rem 1.25rem;
-            border-top: 1px solid rgba(255,255,255,.15);
+            border-top: 1px solid var(--border);
         }
 
         .user-info {
@@ -143,18 +130,18 @@
             width: 2.25rem;
             height: 2.25rem;
             border-radius: 50%;
-            background: var(--bg);
+            background: var(--accent);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: .78rem;
+            font-size: .8rem;
             font-weight: 700;
-            color: var(--accent);
+            color: #fff;
             flex-shrink: 0;
         }
 
-        .user-name { font-size: .85rem; font-weight: 600; color: #fff; }
-        .user-role { font-size: .7rem; color: rgba(255,255,255,.55); }
+        .user-name { font-size: .85rem; font-weight: 600; }
+        .user-role { font-size: .7rem; color: var(--muted); }
 
         .btn-logout {
             display: flex;
@@ -162,10 +149,10 @@
             gap: .5rem;
             width: 100%;
             padding: .5rem .75rem;
-            background: rgba(255,255,255,.1);
-            border: 1px solid rgba(255,255,255,.2);
+            background: rgba(239,68,68,.1);
+            border: 1px solid rgba(239,68,68,.2);
             border-radius: 8px;
-            color: rgba(255,255,255,.85);
+            color: var(--danger);
             font-size: .8rem;
             font-weight: 500;
             cursor: pointer;
@@ -175,8 +162,7 @@
         }
 
         .btn-logout:hover {
-            background: rgba(255,255,255,.2);
-            color: #fff;
+            background: rgba(239,68,68,.2);
         }
 
         /* ── Main ────────────────────────────────── */
@@ -189,7 +175,7 @@
         }
 
         .topbar {
-            background: var(--card);
+            background: var(--surface);
             border-bottom: 1px solid var(--border);
             padding: 1rem 2rem;
             display: flex;
@@ -198,13 +184,11 @@
             position: sticky;
             top: 0;
             z-index: 50;
-            box-shadow: 0 1px 6px rgba(40,59,66,.06);
         }
 
         .page-title {
             font-size: 1.1rem;
             font-weight: 600;
-            color: var(--text);
         }
 
         .page-subtitle {
@@ -224,9 +208,9 @@
             font-size: .65rem;
             padding: .25rem .75rem;
             border-radius: 20px;
-            background: rgba(29,106,150,.1);
+            background: rgba(79,142,247,.12);
             color: var(--accent);
-            border: 1px solid rgba(29,106,150,.25);
+            border: 1px solid rgba(79,142,247,.2);
             text-transform: uppercase;
             letter-spacing: .05em;
         }
@@ -242,7 +226,6 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 1px 4px rgba(40,59,66,.06);
         }
 
         .card-header {
@@ -255,7 +238,6 @@
         .card-title {
             font-size: 1rem;
             font-weight: 600;
-            color: var(--text);
         }
 
         .card-subtitle {
@@ -276,13 +258,6 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 1.25rem;
-            box-shadow: 0 1px 4px rgba(40,59,66,.06);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(40,59,66,.12);
         }
 
         .stat-label {
@@ -307,10 +282,8 @@
         }
 
         .stat-icon {
-            font-size: 1.8rem;
-            color: var(--accent);
+            font-size: 1.5rem;
             margin-bottom: .5rem;
-            opacity: 0.8;
         }
 
         /* ── Buttons ─────────────────────────────── */
@@ -333,28 +306,28 @@
             background: var(--accent);
             color: #fff;
         }
-        .btn-primary:hover { background: var(--accent-h); color: #fff; }
+        .btn-primary:hover { background: var(--accent-h); }
 
         .btn-success {
-            background: rgba(45,138,94,.12);
+            background: rgba(34,197,94,.15);
             color: var(--success);
-            border: 1px solid rgba(45,138,94,.25);
+            border: 1px solid rgba(34,197,94,.25);
         }
-        .btn-success:hover { background: rgba(45,138,94,.22); color: var(--success); }
+        .btn-success:hover { background: rgba(34,197,94,.25); }
 
         .btn-danger {
-            background: rgba(192,57,43,.1);
+            background: rgba(239,68,68,.1);
             color: var(--danger);
-            border: 1px solid rgba(192,57,43,.2);
+            border: 1px solid rgba(239,68,68,.2);
         }
-        .btn-danger:hover { background: rgba(192,57,43,.2); color: var(--danger); }
+        .btn-danger:hover { background: rgba(239,68,68,.2); }
 
         .btn-ghost {
             background: transparent;
             color: var(--muted);
             border: 1px solid var(--border);
         }
-        .btn-ghost:hover { color: var(--text); border-color: var(--muted); background: rgba(29,106,150,.05); }
+        .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
 
         .btn-sm { padding: .4rem .9rem; font-size: .8rem; }
 
@@ -363,7 +336,7 @@
 
         label {
             display: block;
-            font-size: .78rem;
+            font-size: .8rem;
             font-weight: 600;
             color: var(--muted);
             margin-bottom: .4rem;
@@ -379,8 +352,8 @@
         textarea {
             width: 100%;
             padding: .65rem 1rem;
-            background: #fff;
-            border: 1.5px solid var(--border);
+            background: var(--bg);
+            border: 1px solid var(--border);
             border-radius: 8px;
             color: var(--text);
             font-size: .9rem;
@@ -391,7 +364,7 @@
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(29,106,150,.12);
+            box-shadow: 0 0 0 3px rgba(79,142,247,.12);
         }
 
         .form-error {
@@ -417,21 +390,19 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: .08em;
-            color: #fff;
+            color: var(--muted);
             padding: .75rem 1rem;
             border-bottom: 1px solid var(--border);
-            background: var(--accent);
         }
 
         td {
             padding: .85rem 1rem;
-            border-bottom: 1px solid rgba(184,204,202,.5);
+            border-bottom: 1px solid rgba(42,53,72,.6);
             font-size: .875rem;
-            color: var(--text);
         }
 
         tr:last-child td { border-bottom: none; }
-        tr:hover td { background: rgba(133,184,203,.06); }
+        tr:hover td { background: rgba(255,255,255,.015); }
 
         /* ── Badges ──────────────────────────────── */
         .badge {
@@ -443,11 +414,11 @@
             font-family: 'DM Mono', monospace;
         }
 
-        .badge-success { background: rgba(45,138,94,.12);  color: var(--success); }
-        .badge-danger  { background: rgba(192,57,43,.12);  color: var(--danger); }
-        .badge-warning { background: rgba(201,124,16,.12); color: var(--warning); }
-        .badge-info    { background: rgba(29,106,150,.12); color: var(--accent); }
-        .badge-gray    { background: rgba(93,125,132,.1);  color: var(--muted); }
+        .badge-success { background: rgba(34,197,94,.12); color: var(--success); }
+        .badge-danger  { background: rgba(239,68,68,.12); color: var(--danger); }
+        .badge-warning { background: rgba(245,158,11,.12); color: var(--warning); }
+        .badge-info    { background: rgba(79,142,247,.12); color: var(--accent); }
+        .badge-gray    { background: rgba(139,154,191,.1); color: var(--muted); }
 
         /* ── Alerts ──────────────────────────────── */
         .alert {
@@ -460,31 +431,31 @@
             gap: .75rem;
         }
 
-        .alert-success { background: rgba(45,138,94,.1);  border: 1px solid rgba(45,138,94,.25);  color: #1e6640; }
-        .alert-danger  { background: rgba(192,57,43,.08); border: 1px solid rgba(192,57,43,.2);   color: #a0291e; }
-        .alert-warning { background: rgba(201,124,16,.1); border: 1px solid rgba(201,124,16,.25); color: #8a5a0a; }
+        .alert-success { background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.2); color: #4ade80; }
+        .alert-danger  { background: rgba(239,68,68,.1);  border: 1px solid rgba(239,68,68,.2);  color: #f87171; }
+        .alert-warning { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.2); color: #fbbf24; }
 
         /* ── Utils ───────────────────────────────── */
         .mono { font-family: 'DM Mono', monospace; }
-        .text-muted   { color: var(--muted); }
+        .text-muted { color: var(--muted); }
         .text-success { color: var(--success); }
         .text-danger  { color: var(--danger); }
         .text-warning { color: var(--warning); }
         .text-accent  { color: var(--accent); }
-        .flex         { display: flex; }
+        .flex { display: flex; }
         .items-center { align-items: center; }
-        .gap-2  { gap: .5rem; }
-        .gap-3  { gap: .75rem; }
-        .mb-4   { margin-bottom: 1rem; }
-        .mb-6   { margin-bottom: 1.5rem; }
-        .mt-4   { margin-top: 1rem; }
-        .grid   { display: grid; }
+        .gap-2 { gap: .5rem; }
+        .gap-3 { gap: .75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .grid { display: grid; }
         .grid-2 { grid-template-columns: 1fr 1fr; gap: 1rem; }
         .grid-3 { grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
-        .w-full      { width: 100%; }
-        .text-right  { text-align: right; }
+        .w-full { width: 100%; }
+        .text-right { text-align: right; }
         .text-center { text-align: center; }
-        .font-bold   { font-weight: 700; }
+        .font-bold { font-weight: 700; }
         .text-lg { font-size: 1.125rem; }
         .text-sm { font-size: .875rem; }
         .text-xs { font-size: .75rem; }
@@ -495,11 +466,6 @@
             .main { margin-left: 0; }
             .form-row { grid-template-columns: 1fr; }
         }
-
-        @media (max-width: 480px) {
-            .content { padding: 1.25rem; }
-            .topbar  { padding: .85rem 1.25rem; }
-        }
     </style>
     @yield('styles')
 </head>
@@ -508,7 +474,7 @@
 {{-- Sidebar --}}
 <aside class="sidebar">
     <div class="sidebar-logo">
-        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-icon"/>
+        <span class="logo-icon">🐼</span>
         <div>
             <div class="logo-text">Panda Naicha</div>
             <div class="logo-sub">Sistema de Gestión</div>
@@ -530,8 +496,7 @@
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="btn-logout">
-                <i class="bi bi-box-arrow-left"></i>
-                Cerrar sesión
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Cerrar sesión
             </button>
         </form>
     </div>
@@ -552,23 +517,16 @@
 
     <div class="content">
         @if(session('success'))
-            <div class="alert alert-success">
-                <i class="bi bi-check-circle-fill"></i>
-                {{ session('success') }}
-            </div>
+            <div class="alert alert-success">✓ {{ session('success') }}</div>
         @endif
         @if(session('error'))
-            <div class="alert alert-danger">
-                <i class="bi bi-exclamation-circle-fill"></i>
-                {{ session('error') }}
-            </div>
+            <div class="alert alert-danger">✕ {{ session('error') }}</div>
         @endif
         @if($errors->any())
             <div class="alert alert-danger">
-                <i class="bi bi-exclamation-circle-fill" style="flex-shrink:0;margin-top:2px;"></i>
                 <div>
                     @foreach($errors->all() as $e)
-                        <div>{{ $e }}</div>
+                        <div>✕ {{ $e }}</div>
                     @endforeach
                 </div>
             </div>
@@ -578,22 +536,31 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    (function() {
-        window.history.replaceState(null, null, window.location.href);
-        window.addEventListener('popstate', function() {
-            window.location.replace('{{ route('login') }}');
-        });
-        if ('caches' in window) {
-            caches.keys().then(function(cacheNames) {
-                cacheNames.forEach(function(cacheName) { caches.delete(cacheName); });
-            });
-        }
-    })();
-</script>
-
 @yield('scripts')
 @stack('scripts')
+
+<script>
+// ── Seguridad: bloquear acceso con botón "atrás" tras cerrar sesión ──
+(function() {
+    // Marcar esta página como autenticada
+    if (typeof window.history.pushState === 'function') {
+        window.history.pushState({ authenticated: true }, '');
+    }
+    // Si el usuario navega "atrás" a esta página sin sesión activa,
+    // el servidor rechazará la petición. Forzamos verificación.
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            // Página restaurada desde caché del navegador
+            fetch(window.location.href, { method: 'HEAD', credentials: 'same-origin' })
+                .then(res => {
+                    if (res.redirected || res.url.includes('login')) {
+                        window.location.replace('/login');
+                    }
+                })
+                .catch(() => window.location.replace('/login'));
+        }
+    });
+})();
+</script>
 </body>
 </html>

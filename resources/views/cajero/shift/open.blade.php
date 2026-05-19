@@ -4,7 +4,7 @@
 @section('sidebar-nav')
     <span class="nav-section-label">Mi Turno</span>
     <a href="{{ route('cajero.shift.open') }}" class="nav-item active">
-        <i class="bi bi-unlock"></i> Abrir Turno
+        <span class="nav-icon">🔓</span> Abrir Turno
     </a>
 @endsection
 
@@ -19,7 +19,7 @@
         <div class="card">
             <div class="card-header">
                 <div>
-                    <div class="card-title"><i class="bi bi-cash-coin"></i> Efectivo en Caja</div>
+                    <div class="card-title">💵 Efectivo en Caja</div>
                     <div class="card-subtitle">Monto físico al iniciar el turno</div>
                 </div>
             </div>
@@ -40,13 +40,13 @@
         <div class="card">
             <div class="card-header">
                 <div>
-                    <div class="card-title"><i class="bi bi-box"></i> Stock Inicial</div>
+                    <div class="card-title">📦 Stock Inicial</div>
                     <div class="card-subtitle">Unidades disponibles de cada producto</div>
                 </div>
             </div>
             <div style="max-height: 360px; overflow-y: auto;">
                 @foreach($products as $product)
-                    <div class="flex items-center gap-3" style="padding: .6rem 0; border-bottom: 1px solid rgba(184,204,202,.5);">
+                    <div class="flex items-center gap-3" style="padding: .6rem 0; border-bottom: 1px solid rgba(42,53,72,.5);">
                         <div style="flex: 1;">
                             <div class="text-sm font-bold">{{ $product->name }}</div>
                             <div class="text-xs text-muted mono">Bs {{ number_format($product->price, 2) }}</div>
@@ -64,7 +64,7 @@
     </div>
 
     <button type="submit" class="btn btn-primary" style="padding: .875rem 2rem; font-size: 1rem;">
-        <i class="bi bi-unlock"></i> Abrir Turno
+        🔓 Abrir Turno
     </button>
 </form>
 @endsection

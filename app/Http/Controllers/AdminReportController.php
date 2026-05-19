@@ -12,19 +12,12 @@ class AdminReportController extends Controller
 {
     public function __construct(private DecisionTreeService $decisionTree) {}
 
-    /**
-     * Muestra el reporte de cierre diario.
-     * El admin elige la fecha; por defecto muestra ayer (día más probable
-     * de tener turnos cerrados) o hoy si hay turnos ya cerrados hoy.
-     */
     public function dailyReport(Request $request): View
     {
-        // Fecha seleccionada (por defecto: hoy)
         $date = $request->filled('fecha')
             ? \Carbon\Carbon::parse($request->fecha)->startOfDay()
             : today();
 
-        // ── Turnos cerrados del día seleccionado ─────────────────
         $shifts = Shift::where('status', 'CLOSED')
             ->whereDate('start_time', $date)
             ->with([
@@ -36,7 +29,6 @@ class AdminReportController extends Controller
             ->orderBy('start_time')
             ->get();
 
-        // ── Aplicar el árbol de decisiones a cada turno ──────────
         $shiftsWithDecision = $shifts->map(function (Shift $shift) {
             $expected = $shift->expectedCash();
             $reported = (float) ($shift->reported_cash ?? 0);
@@ -45,35 +37,46 @@ class AdminReportController extends Controller
                 'shift'    => $shift,
                 'expected' => $expected,
                 'reported' => $reported,
-                'decision' => $this->decisionTree->evaluate($expected, $reported),
+                'decision' => $this->decisionTree->evaluate($expected, $reported, $shift),
             ];
         });
 
-        // ── Totales consolidados del día ─────────────────────────
-        $totalCash = $shifts->sum(fn($s) =>
-            $s->sales->where('payment_method', 'CASH')->where('status', 'COMPLETED')->sum('total_amount')
-        );
-        $totalQr = $shifts->sum(fn($s) =>
-            $s->sales->where('payment_method', 'QR')->where('status', 'COMPLETED')->sum('total_amount')
-        );
-        $totalSales      = $shifts->sum(fn($s) => $s->sales->where('status', 'COMPLETED')->count());
-        $totalVoided     = $shifts->sum(fn($s) => $s->sales->where('status', 'VOIDED')->count());
-        $totalExpenses   = $shifts->sum(fn($s) =>
-            $s->cashMovements->where('movement_type', 'EXPENSE')->sum('amount')
-        );
-        $totalIncome     = $shifts->sum(fn($s) =>
-            $s->cashMovements->where('movement_type', 'INCOME')->sum('amount')
-        );
-        $netRevenue      = $totalCash + $totalQr - $totalExpenses + $totalIncome;
+        $totalsRow = DB::table('sales')
+            ->join('shifts', 'sales.shift_id', '=', 'shifts.id')
+            ->whereDate('shifts.start_time', $date)
+            ->where('shifts.status', 'CLOSED')
+            ->selectRaw("
+                SUM(CASE WHEN sales.status = 'COMPLETED' AND sales.payment_method = 'CASH' THEN sales.total_amount ELSE 0 END) as total_cash,
+                SUM(CASE WHEN sales.status = 'COMPLETED' AND sales.payment_method = 'QR'   THEN sales.total_amount ELSE 0 END) as total_qr,
+                SUM(CASE WHEN sales.status = 'COMPLETED' THEN 1 ELSE 0 END) as total_sales,
+                SUM(CASE WHEN sales.status = 'VOIDED'    THEN 1 ELSE 0 END) as total_voided
+            ")
+            ->first();
 
-        // ── Resumen de decisiones del día ────────────────────────
+        $movementsRow = DB::table('cash_movements')
+            ->join('shifts', 'cash_movements.shift_id', '=', 'shifts.id')
+            ->whereDate('shifts.start_time', $date)
+            ->where('shifts.status', 'CLOSED')
+            ->selectRaw("
+                SUM(CASE WHEN cash_movements.movement_type = 'EXPENSE' THEN cash_movements.amount ELSE 0 END) as total_expenses,
+                SUM(CASE WHEN cash_movements.movement_type = 'INCOME'  THEN cash_movements.amount ELSE 0 END) as total_income
+            ")
+            ->first();
+
+        $totalCash     = (float) ($totalsRow->total_cash    ?? 0);
+        $totalQr       = (float) ($totalsRow->total_qr      ?? 0);
+        $totalSales    = (int)   ($totalsRow->total_sales   ?? 0);
+        $totalVoided   = (int)   ($totalsRow->total_voided  ?? 0);
+        $totalExpenses = (float) ($movementsRow->total_expenses ?? 0);
+        $totalIncome   = (float) ($movementsRow->total_income   ?? 0);
+        $netRevenue    = $totalCash + $totalQr - $totalExpenses + $totalIncome;
+
         $decisionSummary = [
             'ok'      => $shiftsWithDecision->filter(fn($r) => $r['decision']['classification'] === 'SIN_INCONSISTENCIA')->count(),
             'leve'    => $shiftsWithDecision->filter(fn($r) => $r['decision']['classification'] === 'INCONSISTENCIA_LEVE')->count(),
             'critica' => $shiftsWithDecision->filter(fn($r) => $r['decision']['classification'] === 'INCONSISTENCIA_CRITICA')->count(),
         ];
 
-        // ── Productos vendidos en el día (consolidado) ───────────
         $topProducts = DB::table('sale_details')
             ->join('sales',    'sale_details.sale_id',    '=', 'sales.id')
             ->join('products', 'sale_details.product_id', '=', 'products.id')
@@ -105,4 +108,59 @@ class AdminReportController extends Controller
             'topProducts',
         ));
     }
-}
+
+    // ── PJ-25: Conciliación de Stock y Ventas ────────────────────
+    public function stockReconciliation(Request $request): View
+    {
+        $date = $request->filled('fecha')
+            ? \Carbon\Carbon::parse($request->fecha)->startOfDay()
+            : today();
+
+        // Turnos cerrados del día con su stock y ventas
+        $shifts = Shift::where('status', 'CLOSED')
+            ->whereDate('start_time', $date)
+            ->with([
+                'user',
+                'stock.product',
+                'sales' => fn($q) => $q->where('status', 'COMPLETED')->with('details'),
+            ])
+            ->orderBy('start_time')
+            ->get();
+
+        // Consolidado por producto para el día completo
+        $productSummary = DB::table('shift_stock')
+            ->join('shifts',   'shift_stock.shift_id',   '=', 'shifts.id')
+            ->join('products', 'shift_stock.product_id', '=', 'products.id')
+            ->leftJoin('sale_details', function($join) {
+                $join->on('sale_details.product_id', '=', 'shift_stock.product_id')
+                     ->whereExists(function($sub) {
+                         $sub->from('sales')
+                             ->whereColumn('sales.id', 'sale_details.sale_id')
+                             ->where('sales.status', 'COMPLETED')
+                             ->whereColumn('sales.shift_id', 'shift_stock.shift_id');
+                     });
+            })
+            ->whereDate('shifts.start_time', $date)
+            ->where('shifts.status', 'CLOSED')
+            ->select(
+                'products.id',
+                'products.name',
+                DB::raw('SUM(shift_stock.initial_quantity) as total_initial'),
+                DB::raw('SUM(shift_stock.remaining_quantity) as total_remaining'),
+                DB::raw('SUM(shift_stock.initial_quantity) - SUM(shift_stock.remaining_quantity) as total_salida_fisica'),
+                DB::raw('COALESCE(SUM(sale_details.quantity), 0) as total_vendido_sistema'),
+            )
+            ->groupBy('products.id', 'products.name')
+            ->orderBy('products.name')
+            ->get()
+            ->map(function($row) {
+                $row->diferencia = $row->total_salida_fisica - $row->total_vendido_sistema;
+                return $row;
+            });
+
+        return view('admin.reports.stock-reconciliation', compact(
+            'date',
+            'shifts',
+            'productSummary',
+        ));
+    }

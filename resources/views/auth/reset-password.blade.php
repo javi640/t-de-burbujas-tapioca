@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ asset('images/logo.png') }}"/>
     <title>Nueva Contraseña — Panda Naicha</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -33,12 +32,7 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
         }
 
-        .logo-icon {
-            width: 100px;
-            height: 100px;
-            object-fit: contain;
-            display: block;
-            margin: 0 auto 1rem;
+        h1 {
             font-size: 1.4rem;
             font-weight: 700;
             text-align: center;
@@ -110,33 +104,11 @@
             font-size: 2.5rem;
             margin-bottom: 1rem;
         }
-
-        /* ────── Media Queries para Responsividad ────── */
-        @media (max-width: 768px) {
-            .card { padding: 2rem; max-width: 350px; }
-            .logo-icon { width: 80px; height: 80px; margin-bottom: .8rem; }
-            h1 { font-size: 1.2rem; }
-            p { font-size: .8rem; margin-bottom: 1.5rem; }
-            label { font-size: .7rem; }
-            input { padding: .6rem .8rem; font-size: .9rem; margin-bottom: 1rem; }
-            .btn { padding: .7rem; font-size: .95rem; }
-        }
-
-        @media (max-width: 480px) {
-            .card { padding: 1.5rem; max-width: 100%; }
-            .logo-icon { width: 60px; height: 60px; margin-bottom: .6rem; }
-            h1 { font-size: 1rem; }
-            p { font-size: .75rem; margin-bottom: 1.25rem; }
-            label { font-size: .65rem; }
-            input { padding: .5rem .7rem; font-size: .85rem; margin-bottom: .9rem; }
-            .btn { padding: .6rem; font-size: .9rem; }
-            .err { font-size: .7rem; }
-        }
     </style>
 </head>
 <body>
     <div class="card">
-        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-icon"/>
+        <div class="logo">🐼</div>
         <h1>Nueva Contraseña</h1>
         <p>Ingresa y confirma tu nueva contraseña.</p>
 

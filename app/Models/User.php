@@ -56,11 +56,13 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
+        $this->loadMissing('role');
         return $this->role->slug === 'admin';
     }
 
     public function isCajero(): bool
     {
+        $this->loadMissing('role');
         return $this->role->slug === 'cajero';
     }
 }

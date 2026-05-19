@@ -23,9 +23,16 @@ class AdminSaleController extends Controller
             $query->where('payment_method', $request->payment_method);
         }
 
-        $baseQuery = clone $query;
-        $totalCash = (clone $baseQuery)->where('payment_method', 'CASH')->where('status', 'COMPLETED')->sum('total_amount');
-        $totalQr   = (clone $baseQuery)->where('payment_method', 'QR')->where('status', 'COMPLETED')->sum('total_amount');
+        $totals = (clone $query)
+            ->where('status', 'COMPLETED')
+            ->selectRaw("
+                SUM(CASE WHEN payment_method='CASH' THEN total_amount ELSE 0 END) as cash_total,
+                SUM(CASE WHEN payment_method='QR' THEN total_amount ELSE 0 END) as qr_total
+            ")
+            ->first();
+
+        $totalCash = $totals->cash_total ?? 0;
+        $totalQr   = $totals->qr_total ?? 0;
 
         $sales = $query->paginate(25);
 

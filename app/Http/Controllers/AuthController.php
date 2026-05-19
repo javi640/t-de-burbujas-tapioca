@@ -18,23 +18,11 @@ class AuthController extends Controller
 {
     public function showLogin(): View|RedirectResponse
     {
-        // Si ya está autenticado, redirigir a su área
         if (Auth::check()) {
-            $user = Auth::user();
-            if ($user->isAdmin()) {
-                return redirect()->route('admin.dashboard');
-            }
-            if ($user->hasOpenShift()) {
-                return redirect()->route('cajero.shift.current');
-            }
-            return redirect()->route('cajero.shift.open');
+            return $this->redirectByRole(Auth::user());
         }
 
-        return view('auth.login')->withHeaders([
-            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-            'Pragma'        => 'no-cache',
-            'Expires'       => 'Sat, 01 Jan 2000 00:00:00 GMT',
-        ]);
+        return view('auth.login');
     }
 
     public function login(LoginRequest $request): RedirectResponse
@@ -55,23 +43,67 @@ class AuthController extends Controller
 
         $user = $this->authUser();
 
-        // Auditoría de login
+        // ── Auditoría de login ───────────────────────────────────
         AuditLog::create([
             'user_id'    => $user->id,
             'action'     => 'login',
             'ip_address' => $request->ip(),
         ]);
 
+        // ── Registro de asistencia para cajeros ─────────────────
+        // Si el cajero tiene un turno abierto por el admin y aún
+        // no registró su login, se registra ahora y se calcula
+        // si llegó puntual o con tardanza.
+        if ($user->isCajero()) {
+            $openShift = $user->openShift()->first();
+
+            if ($openShift && $openShift->isPendingCajero()) {
+                $loginTime = now();
+                $openShift->registerCajeroLogin($loginTime);
+
+                // Auditoría de registro de asistencia
+                AuditLog::create([
+                    'user_id'    => $user->id,
+                    'action'     => 'cajero_login_registered',
+                    'model'      => 'Shift',
+                    'model_id'   => $openShift->id,
+                    'new_values' => [
+                        'cajero_login_time' => $loginTime->format('H:i:s'),
+                        'attendance_status' => $openShift->fresh()->attendance_status,
+                    ],
+                    'ip_address' => $request->ip(),
+                ]);
+            }
+        }
+
+        return $this->redirectByRole($user);
+    }
+
+    // ── Helpers privados ─────────────────────────────────────────
+
+    /**
+     * Redirige al usuario según su rol y estado de turno.
+     *
+     * Admin  → panel de administración
+     * Cajero → si tiene turno abierto: módulo de ventas
+     *          si NO tiene turno abierto: pantalla de espera
+     */
+    private function redirectByRole(User $user): RedirectResponse
+    {
         if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
 
+        // Cajero con turno abierto por el admin
         if ($user->hasOpenShift()) {
             return redirect()->route('cajero.shift.current');
         }
 
-        return redirect()->route('cajero.shift.open');
+        // Cajero sin turno asignado: pantalla de espera
+        return redirect()->route('cajero.shift.waiting');
     }
+
+    // ── Reset de contraseña ──────────────────────────────────────
 
     public function showResetForm(string $token): View
     {
@@ -122,7 +154,11 @@ class AuthController extends Controller
     {
         $userId = Auth::id();
 
-        // Auditoría de logout (antes de cerrar sesión)
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         if ($userId) {
             AuditLog::create([
                 'user_id'    => $userId,
@@ -131,19 +167,11 @@ class AuthController extends Controller
             ]);
         }
 
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        // Respuesta con headers anti-caché para evitar que se vea la página al presionar atrás
-        return redirect()
-            ->route('login')
+        return redirect()->route('login')
             ->withHeaders([
-                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0, private',
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
                 'Pragma'        => 'no-cache',
                 'Expires'       => 'Sat, 01 Jan 2000 00:00:00 GMT',
-                'Surrogate-Control' => 'no-store',
-            ])
-            ->with('success', 'Sesión cerrada correctamente');
+            ]);
     }
 }

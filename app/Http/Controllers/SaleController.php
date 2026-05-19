@@ -22,11 +22,20 @@ class SaleController extends Controller
             ->with('stock.product')
             ->firstOrFail();
 
-        $stockItems = $shift->stock->filter(
-            fn($s) => $s->remainingQuantity() > 0
-        );
+        $toppingKeywords = ['boba', 'jelly', 'pearls', 'nata', 'crumbs', 'pudding'];
 
-        return view('cajero.sales.create', compact('shift', 'stockItems'));
+        $isToppingFn = function (string $name) use ($toppingKeywords): bool {
+            foreach ($toppingKeywords as $kw) {
+                if (stripos($name, $kw) !== false) return true;
+            }
+            return false;
+        };
+
+        $allStock     = $shift->stock->filter(fn($s) => $s->remainingQuantity() > 0);
+        $stockItems   = $allStock->filter(fn($s) => !$isToppingFn($s->product->name));
+        $toppingItems = $allStock->filter(fn($s) =>  $isToppingFn($s->product->name));
+
+        return view('cajero.sales.create', compact('shift', 'stockItems', 'toppingItems'));
     }
 
     public function store(StoreSaleRequest $request): RedirectResponse
@@ -36,22 +45,27 @@ class SaleController extends Controller
         $shift = $user->openShift()->firstOrFail();
 
         DB::transaction(function () use ($request, $shift) {
-            $total = 0;
             $items = $request->validated('items');
+            $productIds = collect($items)->pluck('product_id');
 
+            $stocks = ShiftStock::where('shift_id', $shift->id)
+                ->whereIn('product_id', $productIds)
+                ->with('product')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('product_id');
+
+            $total = 0;
             foreach ($items as $item) {
-                $shiftStock = ShiftStock::where('shift_id', $shift->id)
-                    ->where('product_id', $item['product_id'])
-                    ->lockForUpdate()
-                    ->firstOrFail();
+                $ss = $stocks[$item['product_id']] ?? throw new \Exception('Stock no encontrado');
 
-                if (! $shiftStock->hasStock($item['quantity'])) {
+                if (! $ss->hasStock($item['quantity'])) {
                     throw new \Exception(
-                        "Stock insuficiente para: {$shiftStock->product->name}"
+                        "Stock insuficiente para: {$ss->product->name}"
                     );
                 }
 
-                $total += $shiftStock->product->price * $item['quantity'];
+                $total += $ss->product->price * $item['quantity'];
             }
 
             $sale = Sale::create([
@@ -63,19 +77,17 @@ class SaleController extends Controller
             ]);
 
             foreach ($items as $item) {
-                $shiftStock = ShiftStock::where('shift_id', $shift->id)
-                    ->where('product_id', $item['product_id'])
-                    ->first();
+                $ss = $stocks[$item['product_id']];
 
                 SaleDetail::create([
                     'sale_id'    => $sale->id,
                     'product_id' => $item['product_id'],
                     'quantity'   => $item['quantity'],
-                    'unit_price' => $shiftStock->product->price,
-                    'subtotal'   => $shiftStock->product->price * $item['quantity'],
+                    'unit_price' => $ss->product->price,
+                    'subtotal'   => $ss->product->price * $item['quantity'],
                 ]);
 
-                $shiftStock->increment('sold_quantity', $item['quantity']);
+                $ss->increment('sold_quantity', $item['quantity']);
             }
         });
 
@@ -105,6 +117,8 @@ class SaleController extends Controller
             'void_reason.max'      => 'El motivo no puede superar los 500 caracteres.',
         ]);
 
+        $sale->loadMissing('details');
+
         DB::transaction(function () use ($sale) {
             $sale->update([
                 'status'      => 'VOIDED',
@@ -112,11 +126,12 @@ class SaleController extends Controller
                 'void_reason' => request('void_reason'),
             ]);
 
-            foreach ($sale->details as $detail) {
+            $sale->details->groupBy('product_id')->each(function ($details, $productId) use ($sale) {
+                $qty = $details->sum('quantity');
                 ShiftStock::where('shift_id', $sale->shift_id)
-                    ->where('product_id', $detail->product_id)
-                    ->decrement('sold_quantity', $detail->quantity);
-            }
+                    ->where('product_id', $productId)
+                    ->decrement('sold_quantity', $qty);
+            });
 
             AuditLog::create([
                 'user_id'    => Auth::id(),
