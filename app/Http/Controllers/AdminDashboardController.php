@@ -16,7 +16,7 @@ class AdminDashboardController extends Controller
         $mode     = $request->get('modo', 'hoy');
         $isWeek   = $mode === 'semana';
         $dateFrom = $isWeek ? now()->startOfWeek() : today();
-        $dateTo   = $isWeek ? now()->endOfWeek()   : today();
+        $dateTo   = $isWeek ? now()->endOfWeek()   : now()->endOfDay();
         $label    = $isWeek ? 'esta semana' : 'hoy';
         $cacheKey = "dashboard.period.{$mode}.{$dateFrom->format('Y-m-d')}.{$dateTo->format('Y-m-d')}";
 

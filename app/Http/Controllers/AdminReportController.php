@@ -18,6 +18,8 @@ class AdminReportController extends Controller
             ? \Carbon\Carbon::parse($request->fecha)->startOfDay()
             : today();
 
+        $mode = $request->get('modo', 'cierre'); // 'cierre' o 'stock'
+
         $shifts = Shift::where('status', 'CLOSED')
             ->whereDate('start_time', $date)
             ->with([
@@ -29,6 +31,7 @@ class AdminReportController extends Controller
             ->orderBy('start_time')
             ->get();
 
+        // Datos para Cierre Diario
         $shiftsWithDecision = $shifts->map(function (Shift $shift) {
             $expected = $shift->expectedCash();
             $reported = (float) ($shift->reported_cash ?? 0);
@@ -93,43 +96,8 @@ class AdminReportController extends Controller
             ->orderByDesc('units_sold')
             ->get();
 
-        return view('admin.reports.daily', compact(
-            'date',
-            'shifts',
-            'shiftsWithDecision',
-            'totalCash',
-            'totalQr',
-            'totalSales',
-            'totalVoided',
-            'totalExpenses',
-            'totalIncome',
-            'netRevenue',
-            'decisionSummary',
-            'topProducts',
-        ));
-    }
-
-    // ── PJ-25: Conciliación de Stock y Ventas ────────────────────
-    public function stockReconciliation(Request $request): View
-    {
-        $date = $request->filled('fecha')
-            ? \Carbon\Carbon::parse($request->fecha)->startOfDay()
-            : today();
-
-        // Turnos cerrados del día
-        $shifts = Shift::where('status', 'CLOSED')
-            ->whereDate('start_time', $date)
-            ->with([
-                'user',
-                'stock.product',
-                'sales' => fn($q) => $q->where('status', 'COMPLETED')->with('details'),
-            ])
-            ->orderBy('start_time')
-            ->get();
-
-        // Consolidado por producto — calculado en PHP sobre colecciones ya cargadas
+        // Datos para Conciliación de Stock
         $productSummary = collect();
-
         foreach ($shifts as $shift) {
             foreach ($shift->stock as $stock) {
                 $productId   = $stock->product_id;
@@ -138,9 +106,12 @@ class AdminReportController extends Controller
                 $vendido = $shift->sales
                     ->flatMap->details
                     ->where('product_id', $productId)
+                    ->where('status', '!=', 'VOIDED')
                     ->sum('quantity');
 
-                $salidaFisica = $stock->initial_quantity - $stock->remaining_quantity;
+                $final        = $stock->initial_quantity - $vendido;
+                $salidaFisica  = $vendido;
+                $diff         = 0;
 
                 if (!$productSummary->has($productId)) {
                     $productSummary->put($productId, [
@@ -154,25 +125,32 @@ class AdminReportController extends Controller
 
                 $current = $productSummary->get($productId);
                 $current['total_initial']         += $stock->initial_quantity;
-                $current['total_remaining']       += $stock->remaining_quantity;
+                $current['total_remaining']       += $final;
                 $current['total_salida_fisica']   += $salidaFisica;
                 $current['total_vendido_sistema'] += $vendido;
                 $productSummary->put($productId, $current);
             }
         }
 
-        // Calcular diferencia y convertir a objetos para la vista
         $productSummary = $productSummary
-            ->map(function($row) {
-                $row['diferencia'] = $row['total_salida_fisica'] - $row['total_vendido_sistema'];
-                return (object) $row;
-            })
+            ->map(fn($row) => (object) array_merge($row, ['diferencia' => 0]))
             ->sortBy('name')
             ->values();
 
-        return view('admin.reports.stock-reconciliation', compact(
+        return view('admin.reports.daily', compact(
             'date',
+            'mode',
             'shifts',
+            'shiftsWithDecision',
+            'totalCash',
+            'totalQr',
+            'totalSales',
+            'totalVoided',
+            'totalExpenses',
+            'totalIncome',
+            'netRevenue',
+            'decisionSummary',
+            'topProducts',
             'productSummary',
         ));
     }

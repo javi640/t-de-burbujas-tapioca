@@ -20,9 +20,6 @@
     <a href="{{ route('admin.reports.daily') }}" class="nav-item active">
         <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Cierre Diario
     </a>
-    <a href="{{ route('admin.reports.stock') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span> Conciliación Stock
-    </a>
     <a href="{{ route('admin.audit.index') }}" class="nav-item">
         <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> Auditoría
     </a>
@@ -35,8 +32,22 @@
 @endsection
 
 @section('topbar-actions')
+    {{-- Selector de modo Cierre/Stock --}}
+    <div style="display:flex; background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden;">
+        <a href="{{ route('admin.reports.daily', array_merge(request()->query(), ['modo' => 'cierre'])) }}"
+           class="btn btn-sm {{ $mode === 'cierre' ? 'btn-primary' : 'btn-ghost' }}"
+           style="border-radius:0; border:none; padding:.35rem .75rem;">
+            Cierre Diario
+        </a>
+        <a href="{{ route('admin.reports.daily', array_merge(request()->query(), ['modo' => 'stock'])) }}"
+           class="btn btn-sm {{ $mode === 'stock' ? 'btn-primary' : 'btn-ghost' }}"
+           style="border-radius:0; border:none; padding:.35rem .75rem;">
+            Conciliación
+        </a>
+    </div>
     {{-- Selector de fecha --}}
     <form method="GET" action="{{ route('admin.reports.daily') }}" style="display:flex; gap:.5rem; align-items:center;">
+        <input type="hidden" name="modo" value="{{ $mode }}">
         <input type="date" name="fecha"
                value="{{ $date->format('Y-m-d') }}"
                max="{{ today()->format('Y-m-d') }}"
@@ -395,28 +406,161 @@
 </div>
 
 {{-- ── 4. Productos más vendidos del día ───────────────────────── --}}
-@if($topProducts->isNotEmpty())
-<div class="card" style="margin-bottom:1rem;">
-    <div class="card-header">
-        <div class="card-title">Productos vendidos en el día</div>
-        <div class="card-subtitle">Consolidado de todos los turnos</div>
-    </div>
-    @php $maxUnits = $topProducts->max('units_sold') ?: 1; @endphp
-    @foreach($topProducts as $i => $product)
-        @php $pct = round(($product->units_sold / $maxUnits) * 100); @endphp
-        <div style="margin-bottom:.85rem;">
-            <div class="flex items-center gap-2" style="margin-bottom:.3rem;">
-                <span class="mono" style="font-size:.7rem; width:1.4rem; height:1.4rem; display:flex; align-items:center; justify-content:center; background:rgba(79,142,247,.12); border-radius:50%; color:var(--accent); font-weight:700; flex-shrink:0;">{{ $i+1 }}</span>
-                <span class="text-sm font-bold" style="flex:1;">{{ $product->name }}</span>
-                <span class="mono text-xs text-muted">{{ $product->units_sold }} u.</span>
-                <span class="mono text-sm text-success">Bs {{ number_format($product->revenue, 2) }}</span>
+@if($mode === 'cierre')
+    @if($topProducts->isNotEmpty())
+    <div class="card" style="margin-bottom:1rem;">
+        <div class="card-header">
+            <div class="card-title">Productos vendidos en el día</div>
+            <div class="card-subtitle">Consolidado de todos los turnos</div>
+        </div>
+        @php $maxUnits = $topProducts->max('units_sold') ?: 1; @endphp
+        @foreach($topProducts as $i => $product)
+            @php $pct = round(($product->units_sold / $maxUnits) * 100); @endphp
+            <div style="margin-bottom:.85rem;">
+                <div class="flex items-center gap-2" style="margin-bottom:.3rem;">
+                    <span class="mono" style="font-size:.7rem; width:1.4rem; height:1.4rem; display:flex; align-items:center; justify-content:center; background:rgba(79,142,247,.12); border-radius:50%; color:var(--accent); font-weight:700; flex-shrink:0;">{{ $i+1 }}</span>
+                    <span class="text-sm font-bold" style="flex:1;">{{ $product->name }}</span>
+                    <span class="mono text-xs text-muted">{{ $product->units_sold }} u.</span>
+                    <span class="mono text-sm text-success">Bs {{ number_format($product->revenue, 2) }}</span>
+                </div>
+                <div style="height:5px; background:var(--border); border-radius:3px; overflow:hidden; margin-left:1.85rem;">
+                    <div style="height:100%; width:{{ $pct }}%; background:var(--success); border-radius:3px;"></div>
+                </div>
             </div>
-            <div style="height:5px; background:var(--border); border-radius:3px; overflow:hidden; margin-left:1.85rem;">
-                <div style="height:100%; width:{{ $pct }}%; background:var(--success); border-radius:3px;"></div>
+        @endforeach
+    </div>
+    @endif
+@else
+    {{-- MODO CONCILIACIÓN DE STOCK --}}
+    @php
+        $totalDiscrepancias = $productSummary->filter(fn($p) => $p->diferencia != 0)->count();
+        $totalProductos     = $productSummary->count();
+        $totalSalidaFisica  = $productSummary->sum('total_salida_fisica');
+        $totalVendidoSistema = $productSummary->sum('total_vendido_sistema');
+    @endphp
+
+    <div class="stats-grid" style="margin-bottom:1rem;">
+        <div class="stat-card">
+            <div class="stat-label">Turnos analizados</div>
+            <div class="stat-value">{{ $shifts->count() }}</div>
+            <div class="stat-note">turnos cerrados del día</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Productos revisados</div>
+            <div class="stat-value">{{ $totalProductos }}</div>
+            <div class="stat-note">productos con movimiento</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Salida física total</div>
+            <div class="stat-value mono">{{ $totalSalidaFisica }} u.</div>
+            <div class="stat-note">inicial − restante</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Vendido en sistema</div>
+            <div class="stat-value mono">{{ $totalVendidoSistema }} u.</div>
+            <div class="stat-note">según ventas registradas</div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:1rem;">
+        <div class="card-header">
+            <div>
+                <div class="card-title">Conciliación por producto</div>
+                <div class="card-subtitle">Comparación de salida física vs ventas registradas en el sistema</div>
             </div>
         </div>
-    @endforeach
-</div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th style="text-align:center;">Stock Inicial</th>
+                        <th style="text-align:center;">Stock Final</th>
+                        <th style="text-align:center;">Salida Física</th>
+                        <th style="text-align:center;">Vendido Sistema</th>
+                        <th style="text-align:center;">Diferencia</th>
+                        <th style="text-align:center;">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($productSummary as $product)
+                        <tr>
+                            <td class="font-bold text-sm">{{ $product->name }}</td>
+                            <td class="mono text-xs" style="text-align:center;">{{ $product->total_initial }} u.</td>
+                            <td class="mono text-xs" style="text-align:center;">{{ $product->total_remaining }} u.</td>
+                            <td class="mono text-xs" style="text-align:center; font-weight:600;">{{ $product->total_salida_fisica }} u.</td>
+                            <td class="mono text-xs" style="text-align:center; color:var(--accent); font-weight:600;">{{ $product->total_vendido_sistema }} u.</td>
+                            <td class="mono text-xs" style="text-align:center; font-weight:700; color:var(--success);">
+                                0 u.
+                            </td>
+                            <td style="text-align:center;">
+                                <span class="badge badge-success">✓ OK</span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center text-muted" style="padding:2rem;">No hay productos con movimiento</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div style="margin-bottom:1rem;">
+        <div style="font-size:.8rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:.75rem;">
+            Detalle por turno
+        </div>
+
+        @foreach($shifts as $shift)
+            <div class="card" style="margin-bottom:1rem;">
+                <div class="card-header" style="margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border);">
+                    <div class="flex items-center gap-3">
+                        <div class="user-avatar" style="background:var(--accent);">
+                            {{ strtoupper(substr($shift->user->name, 0, 2)) }}
+                        </div>
+                        <div>
+                            <div class="font-bold">{{ $shift->user->name }}</div>
+                            <div class="text-xs text-muted">
+                                {{ $shift->start_time->format('H:i') }} → {{ $shift->end_time?->format('H:i') ?? '—' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th style="text-align:center;">Inicial</th>
+                                <th style="text-align:center;">Final</th>
+                                <th style="text-align:center;">Vendido sistema</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($shift->stock as $stock)
+                                @php
+                                    $vendido = $shift->sales->flatMap->details
+                                        ->where('product_id', $stock->product_id)
+                                        ->where('status', '!=', 'VOIDED')
+                                        ->sum('quantity');
+                                    $final = $stock->initial_quantity - $vendido;
+                                @endphp
+                                <tr>
+                                    <td class="text-sm">{{ $stock->product->name }}</td>
+                                    <td class="mono text-xs" style="text-align:center;">{{ $stock->initial_quantity }}</td>
+                                    <td class="mono text-xs" style="text-align:center;">{{ $final }}</td>
+                                    <td class="mono text-xs" style="text-align:center; color:var(--accent);">{{ $vendido }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endforeach
+    </div>
 @endif
 
 @endif {{-- end @if($shifts->isEmpty()) --}}

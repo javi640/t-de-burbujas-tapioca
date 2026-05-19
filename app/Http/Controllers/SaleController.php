@@ -9,6 +9,7 @@ use App\Models\ShiftStock;
 use App\Models\AuditLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -91,6 +92,8 @@ class SaleController extends Controller
             }
         });
 
+        $this->clearDashboardCache();
+
         return redirect()
             ->route('cajero.sales.create')
             ->with('success', 'Venta registrada correctamente.');
@@ -143,6 +146,15 @@ class SaleController extends Controller
             ]);
         });
 
+        $this->clearDashboardCache();
+
         return back()->with('success', 'Venta anulada y stock restaurado.');
+    }
+
+    private function clearDashboardCache(): void
+    {
+        Cache::forget('dashboard.active_shifts');
+        Cache::forget('dashboard.period.hoy.' . today()->format('Y-m-d') . '.' . today()->format('Y-m-d'));
+        Cache::forget('dashboard.period.semana.' . now()->startOfWeek()->format('Y-m-d') . '.' . now()->endOfWeek()->format('Y-m-d'));
     }
 }
