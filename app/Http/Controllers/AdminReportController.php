@@ -116,7 +116,7 @@ class AdminReportController extends Controller
             ? \Carbon\Carbon::parse($request->fecha)->startOfDay()
             : today();
 
-        // Turnos cerrados del día con su stock y ventas
+        // Turnos cerrados del día
         $shifts = Shift::where('status', 'CLOSED')
             ->whereDate('start_time', $date)
             ->with([
@@ -127,36 +127,48 @@ class AdminReportController extends Controller
             ->orderBy('start_time')
             ->get();
 
-        // Consolidado por producto para el día completo
-        $productSummary = DB::table('shift_stock')
-            ->join('shifts',   'shift_stock.shift_id',   '=', 'shifts.id')
-            ->join('products', 'shift_stock.product_id', '=', 'products.id')
-            ->leftJoin('sale_details', function($join) {
-                $join->on('sale_details.product_id', '=', 'shift_stock.product_id')
-                     ->whereExists(function($sub) {
-                         $sub->from('sales')
-                             ->whereColumn('sales.id', 'sale_details.sale_id')
-                             ->where('sales.status', 'COMPLETED')
-                             ->whereColumn('sales.shift_id', 'shift_stock.shift_id');
-                     });
-            })
-            ->whereDate('shifts.start_time', $date)
-            ->where('shifts.status', 'CLOSED')
-            ->select(
-                'products.id',
-                'products.name',
-                DB::raw('SUM(shift_stock.initial_quantity) as total_initial'),
-                DB::raw('SUM(shift_stock.remaining_quantity) as total_remaining'),
-                DB::raw('SUM(shift_stock.initial_quantity) - SUM(shift_stock.remaining_quantity) as total_salida_fisica'),
-                DB::raw('COALESCE(SUM(sale_details.quantity), 0) as total_vendido_sistema'),
-            )
-            ->groupBy('products.id', 'products.name')
-            ->orderBy('products.name')
-            ->get()
+        // Consolidado por producto — calculado en PHP sobre colecciones ya cargadas
+        $productSummary = collect();
+
+        foreach ($shifts as $shift) {
+            foreach ($shift->stock as $stock) {
+                $productId   = $stock->product_id;
+                $productName = $stock->product->name ?? '—';
+
+                $vendido = $shift->sales
+                    ->flatMap->details
+                    ->where('product_id', $productId)
+                    ->sum('quantity');
+
+                $salidaFisica = $stock->initial_quantity - $stock->remaining_quantity;
+
+                if (!$productSummary->has($productId)) {
+                    $productSummary->put($productId, [
+                        'name'                  => $productName,
+                        'total_initial'         => 0,
+                        'total_remaining'       => 0,
+                        'total_salida_fisica'   => 0,
+                        'total_vendido_sistema' => 0,
+                    ]);
+                }
+
+                $current = $productSummary->get($productId);
+                $current['total_initial']         += $stock->initial_quantity;
+                $current['total_remaining']       += $stock->remaining_quantity;
+                $current['total_salida_fisica']   += $salidaFisica;
+                $current['total_vendido_sistema'] += $vendido;
+                $productSummary->put($productId, $current);
+            }
+        }
+
+        // Calcular diferencia y convertir a objetos para la vista
+        $productSummary = $productSummary
             ->map(function($row) {
-                $row->diferencia = $row->total_salida_fisica - $row->total_vendido_sistema;
-                return $row;
-            });
+                $row['diferencia'] = $row['total_salida_fisica'] - $row['total_vendido_sistema'];
+                return (object) $row;
+            })
+            ->sortBy('name')
+            ->values();
 
         return view('admin.reports.stock-reconciliation', compact(
             'date',
@@ -164,3 +176,4 @@ class AdminReportController extends Controller
             'productSummary',
         ));
     }
+}

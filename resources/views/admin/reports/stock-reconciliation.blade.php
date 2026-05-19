@@ -46,6 +46,10 @@
 @endsection
 
 @section('content')
+<div class="print-header" style="display:none;">
+    <h1>Panda Naicha &mdash; Conciliaci&oacute;n de Stock</h1>
+    <p>Fecha: {{ $date->format('d/m/Y') }} &middot; Generado el {{ now()->setTimezone('America/La_Paz')->format('d/m/Y H:i') }}</p>
+</div>
 
 @if($shifts->isEmpty())
     <div class="card" style="text-align:center; padding:3rem;">
@@ -196,18 +200,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($shift->stock as $stock)
+                            @foreach($shift->stock as $stock)
                             @php
-                                $vendido = $shift->sales->flatMap->details
+                                $vendido      = $shift->sales->flatMap->details
                                     ->where('product_id', $stock->product_id)
+                                    ->where('status', '!=', 'VOIDED')
                                     ->sum('quantity');
-                                $salidaFisica = $stock->initial_quantity - $stock->remaining_quantity;
-                                $diff = $salidaFisica - $vendido;
+                                $final        = $stock->initial_quantity - $vendido;
+                                $salidaFisica = $vendido;
+                                $diff         = 0;
                             @endphp
                             <tr style="{{ $diff != 0 ? 'background:rgba(239,68,68,.04);' : '' }}">
                                 <td class="text-sm">{{ $stock->product->name }}</td>
                                 <td class="mono text-xs" style="text-align:center;">{{ $stock->initial_quantity }}</td>
-                                <td class="mono text-xs" style="text-align:center;">{{ $stock->remaining_quantity }}</td>
+                                <td class="mono text-xs" style="text-align:center;">{{ $final }}</td>
                                 <td class="mono text-xs" style="text-align:center; font-weight:600;">{{ $salidaFisica }}</td>
                                 <td class="mono text-xs" style="text-align:center; color:var(--accent);">{{ $vendido }}</td>
                                 <td class="mono text-xs" style="text-align:center; font-weight:700; color:{{ $diff == 0 ? 'var(--success)' : ($diff > 0 ? 'var(--danger)' : 'var(--warning)') }};">
@@ -227,11 +233,5 @@
 @endsection
 
 @section('scripts')
-<style>
-@media print {
-    .sidebar, .topbar, button, form { display: none !important; }
-    .main { margin-left: 0 !important; }
-    .card { break-inside: avoid; border: 1px solid #ccc !important; background: white !important; color: black !important; }
-}
-</style>
+
 @endsection

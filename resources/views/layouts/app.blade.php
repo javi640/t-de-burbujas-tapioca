@@ -468,6 +468,79 @@
         }
     </style>
     @yield('styles')
+
+<style>
+@media print {
+    .sidebar, .topbar, .btn, button, form, .nav-item, .nav-section-label,
+    [onclick], input[type="date"], input[type="submit"] {
+        display: none !important;
+    }
+    body {
+        background: #ffffff !important;
+        color: #111111 !important;
+        font-family: Arial, sans-serif !important;
+        font-size: 11pt !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .main, .content, main {
+        margin-left: 0 !important;
+        padding: 1cm 1.5cm !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .card {
+        background: #ffffff !important;
+        border: 1px solid #cccccc !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        margin-bottom: 1rem !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
+    .card-title { color: #111111 !important; font-size: 12pt !important; font-weight: 700 !important; }
+    .card-subtitle { color: #555555 !important; font-size: 9pt !important; }
+    .stats-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: .5rem !important;
+        margin-bottom: 1rem !important;
+    }
+    .stat-card {
+        background: #f5f5f5 !important;
+        border: 1px solid #cccccc !important;
+        border-radius: 0 !important;
+        padding: .6rem !important;
+        break-inside: avoid !important;
+    }
+    .stat-label { color: #555555 !important; font-size: 7pt !important; text-transform: uppercase !important; }
+    .stat-value { color: #111111 !important; font-size: 14pt !important; font-weight: 700 !important; }
+    .stat-note  { color: #777777 !important; font-size: 7pt !important; }
+    table { width: 100% !important; border-collapse: collapse !important; font-size: 9pt !important; }
+    thead tr { background: #eeeeee !important; border-bottom: 2px solid #999999 !important; }
+    th { color: #333333 !important; font-weight: 700 !important; padding: .4rem .5rem !important; font-size: 8pt !important; text-transform: uppercase !important; }
+    td { color: #111111 !important; padding: .35rem .5rem !important; border-bottom: 1px solid #e0e0e0 !important; }
+    tfoot tr { background: #f0f0f0 !important; border-top: 2px solid #999999 !important; font-weight: 700 !important; }
+    .badge, span[class*="badge"] { border: 1px solid #999999 !important; background: #ffffff !important; color: #111111 !important; padding: .1rem .4rem !important; font-size: 8pt !important; }
+    .badge-success { border-color: #16a34a !important; color: #16a34a !important; }
+    .badge-warning { border-color: #d97706 !important; color: #d97706 !important; }
+    .badge-danger  { border-color: #dc2626 !important; color: #dc2626 !important; }
+    .badge-info    { border-color: #2563eb !important; color: #2563eb !important; }
+    .text-success, .text-accent { color: #16a34a !important; }
+    .text-danger  { color: #dc2626 !important; }
+    .text-warning { color: #d97706 !important; }
+    .text-muted   { color: #666666 !important; }
+    .mono { font-family: 'Courier New', monospace !important; }
+    .print-header { display: block !important; text-align: center !important; margin-bottom: 1.5rem !important; padding-bottom: .75rem !important; border-bottom: 2px solid #333333 !important; }
+    .print-header h1 { font-size: 16pt !important; font-weight: 700 !important; color: #111111 !important; margin: 0 0 .25rem !important; }
+    .print-header p  { font-size: 9pt !important; color: #555555 !important; margin: 0 !important; }
+    [style*="display:none"] { display: block !important; }
+    .grid-2 { display: block !important; }
+    .grid-2 > * { width: 100% !important; margin-bottom: .5rem !important; }
+    h2, h3, .card-title { page-break-after: avoid !important; }
+}
+</style>
+
 </head>
 <body>
 

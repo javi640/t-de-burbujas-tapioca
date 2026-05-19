@@ -5,11 +5,11 @@
     <span class="nav-section-label">Mi Turno</span>
     @if(auth()->user()->isAdmin())
         <a href="{{ route('admin.shifts.index') }}" class="nav-item">
-            <span class="nav-icon">⏱</span> Ver Turnos
+            <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Ver Turnos
         </a>
     @else
         <a href="{{ route('cajero.shift.waiting') }}" class="nav-item">
-            <span class="nav-icon">⏳</span> Mi Turno
+            <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Mi Turno
         </a>
     @endif
 @endsection
@@ -77,9 +77,5 @@
     </div>
 </div>
 
-@if(auth()->user()->isCajero())
-<div class="mt-4">
-    <a href="{{ route('cajero.shift.open') }}" class="btn btn-primary">🔓 Abrir Nuevo Turno</a>
-</div>
-@endif
+
 @endsection

@@ -29,6 +29,10 @@
 @section('page-subtitle', 'Todas las transacciones registradas')
 
 @section('content')
+<div class="print-header" style="display:none;">
+    <h1>Panda Naicha &mdash; Historial de Ventas</h1>
+    <p>Generado el {{ now()->setTimezone('America/La_Paz')->format('d/m/Y H:i') }} por {{ auth()->user()->name }}</p>
+</div>
 {{-- Filtros --}}
 <div class="card mb-4">
     <form method="GET" action="{{ route('admin.sales.index') }}">

@@ -48,6 +48,10 @@
 @endsection
 
 @section('content')
+<div class="print-header" style="display:none;">
+    <h1>Panda Naicha &mdash; Reporte de Cierre Diario</h1>
+    <p>Fecha: {{ $date->format('d/m/Y') }} &middot; Generado el {{ now()->setTimezone('America/La_Paz')->format('d/m/Y H:i') }}</p>
+</div>
 
 @if($shifts->isEmpty())
     {{-- ── Sin datos para la fecha ──────────────────────────────── --}}
@@ -435,12 +439,5 @@ function toggleDetail(id) {
 </script>
 
 {{-- Estilos para impresión --}}
-<style>
-@media print {
-    .sidebar, .topbar, button, form { display: none !important; }
-    .main { margin-left: 0 !important; }
-    .card { break-inside: avoid; border: 1px solid #ccc !important; background: white !important; color: black !important; }
-    [style*="display:none"] { display: block !important; }
-}
-</style>
+
 @endsection
