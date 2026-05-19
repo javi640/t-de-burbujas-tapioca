@@ -46,6 +46,7 @@
         'close_shift'             => ['Cierres de turno',           'close_shift'],
         'void_sale'               => ['Anulaciones',                 'void_sale'],
         'cajero_login_registered' => ['Registro de asistencia',     'cajero_login_registered'],
+        'cash_movement'           => ['Movimiento de caja',         'cash_movement'],
     ];
     $actionIcons = [
         'login'                   => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>',
@@ -55,6 +56,7 @@
         'close_shift'             => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--warning)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
         'void_sale'               => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--danger)"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
         'cajero_login_registered' => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#a78bfa"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>',
+        'cash_movement'           => '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#34d399"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
     ];
 
     $actionBadgeClass = [
@@ -65,6 +67,7 @@
         'close_shift'             => 'badge-warning',
         'void_sale'               => 'badge-danger',
         'cajero_login_registered' => 'badge-purple',
+        'cash_movement'           => 'badge-teal',
     ];
 
     $actionCountStyle = [
@@ -75,11 +78,12 @@
         'close_shift'             => 'color:var(--warning)',
         'void_sale'               => 'color:var(--danger)',
         'cajero_login_registered' => 'color:#a78bfa',
+        'cash_movement'           => 'color:#34d399',
     ];
 @endphp
 
 {{-- ── Contadores por acción ────────────────────────────────── --}}
-<div class="stats-grid" style="grid-template-columns: repeat(7, 1fr); margin-bottom: 1rem;">
+<div class="stats-grid" style="grid-template-columns: repeat(8, 1fr); margin-bottom: 1rem;">
     @foreach($actionLabels as $key => [$label, $icon])
         <div class="stat-card" style="text-align:center;">
             <div style="display:flex;justify-content:center;margin-bottom:.5rem;">{!! $actionIcons[$key] ?? '' !!}</div>
