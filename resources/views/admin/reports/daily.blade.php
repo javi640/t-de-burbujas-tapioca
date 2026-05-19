@@ -74,6 +74,7 @@
     </div>
 @else
 
+@if($mode === 'cierre')
 {{-- ── 1. Métricas del día ──────────────────────────────────────── --}}
 <div class="stats-grid">
     <div class="stat-card">
@@ -234,7 +235,7 @@
                     <div class="font-bold">{{ $shift->user->name }}</div>
                     <div class="text-xs text-muted">
                         {{ $shift->start_time->format('H:i') }} → {{ $shift->end_time?->format('H:i') ?? '—' }}
-                        · {{ $shift->start_time->diffInMinutes($shift->end_time) }} min
+                        · {{ (int) $shift->start_time->diffInMinutes($shift->end_time) }} min
                     </div>
                 </div>
                 {{-- Badge de resultado del árbol --}}
@@ -406,7 +407,6 @@
 </div>
 
 {{-- ── 4. Productos más vendidos del día ───────────────────────── --}}
-@if($mode === 'cierre')
     @if($topProducts->isNotEmpty())
     <div class="card" style="margin-bottom:1rem;">
         <div class="card-header">
@@ -430,8 +430,9 @@
         @endforeach
     </div>
     @endif
-@else
-    {{-- MODO CONCILIACIÓN DE STOCK --}}
+
+@else {{-- modo stock --}}
+{{-- MODO CONCILIACIÓN DE STOCK --}}
     @php
         $totalDiscrepancias = $productSummary->filter(fn($p) => $p->diferencia != 0)->count();
         $totalProductos     = $productSummary->count();
@@ -561,7 +562,7 @@
             </div>
         @endforeach
     </div>
-@endif
+@endif {{-- end mode --}}
 
 @endif {{-- end @if($shifts->isEmpty()) --}}
 
