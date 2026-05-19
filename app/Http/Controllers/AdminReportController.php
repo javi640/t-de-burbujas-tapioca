@@ -108,4 +108,59 @@ class AdminReportController extends Controller
             'topProducts',
         ));
     }
-}
+
+    // ── PJ-25: Conciliación de Stock y Ventas ────────────────────
+    public function stockReconciliation(Request $request): View
+    {
+        $date = $request->filled('fecha')
+            ? \Carbon\Carbon::parse($request->fecha)->startOfDay()
+            : today();
+
+        // Turnos cerrados del día con su stock y ventas
+        $shifts = Shift::where('status', 'CLOSED')
+            ->whereDate('start_time', $date)
+            ->with([
+                'user',
+                'stock.product',
+                'sales' => fn($q) => $q->where('status', 'COMPLETED')->with('details'),
+            ])
+            ->orderBy('start_time')
+            ->get();
+
+        // Consolidado por producto para el día completo
+        $productSummary = DB::table('shift_stock')
+            ->join('shifts',   'shift_stock.shift_id',   '=', 'shifts.id')
+            ->join('products', 'shift_stock.product_id', '=', 'products.id')
+            ->leftJoin('sale_details', function($join) {
+                $join->on('sale_details.product_id', '=', 'shift_stock.product_id')
+                     ->whereExists(function($sub) {
+                         $sub->from('sales')
+                             ->whereColumn('sales.id', 'sale_details.sale_id')
+                             ->where('sales.status', 'COMPLETED')
+                             ->whereColumn('sales.shift_id', 'shift_stock.shift_id');
+                     });
+            })
+            ->whereDate('shifts.start_time', $date)
+            ->where('shifts.status', 'CLOSED')
+            ->select(
+                'products.id',
+                'products.name',
+                DB::raw('SUM(shift_stock.initial_quantity) as total_initial'),
+                DB::raw('SUM(shift_stock.remaining_quantity) as total_remaining'),
+                DB::raw('SUM(shift_stock.initial_quantity) - SUM(shift_stock.remaining_quantity) as total_salida_fisica'),
+                DB::raw('COALESCE(SUM(sale_details.quantity), 0) as total_vendido_sistema'),
+            )
+            ->groupBy('products.id', 'products.name')
+            ->orderBy('products.name')
+            ->get()
+            ->map(function($row) {
+                $row->diferencia = $row->total_salida_fisica - $row->total_vendido_sistema;
+                return $row;
+            });
+
+        return view('admin.reports.stock-reconciliation', compact(
+            'date',
+            'shifts',
+            'productSummary',
+        ));
+    }

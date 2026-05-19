@@ -72,6 +72,7 @@ Route::middleware(['auth', 'role:admin', 'prevent-cache'])->prefix('admin')->nam
 
     // Reportes
     Route::get('/reportes/cierre-diario', [AdminReportController::class, 'dailyReport'])->name('reports.daily');
+    Route::get('/reportes/conciliacion-stock', [AdminReportController::class, 'stockReconciliation'])->name('reports.stock');
 
     // Auditoría
     Route::get('/auditoria', [AdminAuditController::class, 'index'])->name('audit.index');
