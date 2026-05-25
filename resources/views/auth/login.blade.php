@@ -263,7 +263,7 @@
     <div class="login-wrapper">
 
         <div class="logo-area">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-icon"/>
+            <img src="{{ asset('image/logo.png') }}" alt="Logo" class="logo-icon"/>
             <h1>Panda Naicha</h1>
             <p>Sistema de Gestión de Ventas</p>
         </div>
