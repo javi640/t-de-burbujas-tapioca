@@ -5,11 +5,11 @@
     <span class="nav-section-label">Mi Turno</span>
     @if(auth()->user()->isAdmin())
         <a href="{{ route('admin.shifts.index') }}" class="nav-item">
-            <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Ver Turnos
+            <span class="nav-icon"><i class="bi bi-clock-history"></i></span> Ver Turnos
         </a>
     @else
         <a href="{{ route('cajero.shift.waiting') }}" class="nav-item">
-            <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Mi Turno
+            <span class="nav-icon"><i class="bi bi-clock"></i></span> Mi Turno
         </a>
     @endif
 @endsection
@@ -22,21 +22,33 @@
 @section('content')
 <div class="stats-grid">
     <div class="stat-card">
+        <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
         <div class="stat-label">Efectivo Esperado</div>
         <div class="stat-value mono">Bs {{ number_format($shift->expectedCash(), 2) }}</div>
     </div>
     <div class="stat-card">
+        <div class="stat-icon"><i class="bi bi-cash-coin"></i></div>
         <div class="stat-label">Efectivo Declarado</div>
         <div class="stat-value mono">Bs {{ number_format($shift->reported_cash, 2) }}</div>
     </div>
     <div class="stat-card">
+        <div class="stat-icon"><i class="bi bi-arrow-left-right"></i></div>
         <div class="stat-label">Diferencia</div>
         <div class="stat-value mono {{ $shift->cash_difference < 0 ? 'text-danger' : ($shift->cash_difference > 0 ? 'text-warning' : 'text-success') }}">
             Bs {{ number_format($shift->cash_difference, 2) }}
         </div>
-        <div class="stat-note">{{ $shift->cash_difference == 0 ? '✓ Cuadrado' : ($shift->cash_difference < 0 ? '⚠ Faltante' : '⚠ Sobrante') }}</div>
+        <div class="stat-note">
+            @if($shift->cash_difference == 0)
+                <i class="bi bi-check-circle-fill text-success"></i> Cuadrado
+            @elseif($shift->cash_difference < 0)
+                <i class="bi bi-exclamation-triangle-fill text-danger"></i> Faltante
+            @else
+                <i class="bi bi-exclamation-triangle-fill text-warning"></i> Sobrante
+            @endif
+        </div>
     </div>
     <div class="stat-card">
+        <div class="stat-icon"><i class="bi bi-qr-code-scan"></i></div>
         <div class="stat-label">Total QR</div>
         <div class="stat-value mono text-accent">Bs {{ number_format($shift->totalQr(), 2) }}</div>
     </div>
@@ -44,7 +56,10 @@
 
 <div class="card">
     <div class="card-header">
-        <div class="card-title">Ventas del Turno</div>
+        <div class="card-title">
+            <i class="bi bi-receipt" style="vertical-align:middle; margin-right:5px;"></i>
+            Ventas del Turno
+        </div>
         <div class="text-muted text-sm">{{ $shift->sales->count() }} transacciones</div>
     </div>
     <div class="table-wrap">
@@ -76,6 +91,5 @@
         </table>
     </div>
 </div>
-
 
 @endsection
