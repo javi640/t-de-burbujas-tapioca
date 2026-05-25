@@ -176,7 +176,7 @@
 </head>
 <body>
     <div class="card">
-        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo-icon"/>
+        <img src="{{ asset('image/logo.png') }}" alt="Logo" class="logo-icon"/>
         <h1>Recuperar Contraseña</h1>
         <p>Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.</p>
 
