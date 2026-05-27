@@ -1,27 +1,28 @@
 @extends('layouts.app')
 @section('title', 'Dashboard Admin')
 
+
 @section('sidebar-nav')
     <span class="nav-section-label">Principal</span>
     <a href="{{ route('admin.dashboard') }}" class="nav-item active">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span> Dashboard
+        <span class="nav-icon"><i class="bi bi-grid-fill"></i></span> Dashboard
     </a>
     <span class="nav-section-label">Gestión</span>
     <a href="{{ route('admin.users.index') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Usuarios
+        <span class="nav-icon"><i class="bi bi-people-fill"></i></span> Usuarios
     </a>
     <a href="{{ route('admin.sales.index') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></span> Historial Ventas
+        <span class="nav-icon"><i class="bi bi-receipt"></i></span> Historial Ventas
     </a>
     <a href="{{ route('admin.shifts.index') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Turnos
+        <span class="nav-icon"><i class="bi bi-clock-fill"></i></span> Turnos
     </a>
     <span class="nav-section-label">Reportes</span>
     <a href="{{ route('admin.reports.daily') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Cierre Diario
+        <span class="nav-icon"><i class="bi bi-file-earmark-text"></i></span> Cierre Diario
     </a>
     <a href="{{ route('admin.audit.index') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> Auditoría
+        <span class="nav-icon"><i class="bi bi-search"></i></span> Auditoría
     </a>
 @endsection
 
@@ -33,13 +34,13 @@
 
 @section('topbar-actions')
     <a href="{{ route('admin.shifts.open') }}" class="btn btn-primary btn-sm">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+        
         Abrir Turno
     </a>
     <span id="live-clock" class="text-xs text-muted mono"></span>
 
     {{-- ── Selector Hoy / Esta semana ── --}}
-    <div style="display:flex; gap:.35rem; background:rgba(42,53,72,.5); border:1px solid var(--border); border-radius:8px; padding:.25rem;">
+    <div style="display:flex; gap:.35rem; background:rgba(184,204,202,.3); border:1px solid var(--border); border-radius:8px; padding:.25rem;">
         <a href="{{ route('admin.dashboard', ['modo' => 'hoy']) }}"
            style="padding:.3rem .75rem; border-radius:6px; font-size:.78rem; font-weight:600; text-decoration:none;
                   {{ $mode === 'hoy' ? 'background:var(--accent); color:#fff;' : 'color:var(--muted);' }}">
@@ -59,31 +60,31 @@
 {{-- ── 1. Tarjetas métricas ─────────────────────────────────────── --}}
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-icon">⏱</div>
+        <div class="stat-icon"><i class="bi bi-stopwatch"></i></div>
         <div class="stat-label">Turnos Abiertos</div>
         <div class="stat-value">{{ $openShifts }}</div>
         <div class="stat-note">en este momento</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">🛒</div>
+        <div class="stat-icon"><i class="bi bi-cart3"></i></div>
         <div class="stat-label">Ventas {{ ucfirst($label) }}</div>
         <div class="stat-value">{{ $todaySalesCount }}</div>
         <div class="stat-note">transacciones completadas</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">💵</div>
+        <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
         <div class="stat-label">Total Efectivo</div>
         <div class="stat-value mono">Bs {{ number_format($todayCash, 2) }}</div>
         <div class="stat-note">recaudado {{ $label }}</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">📱</div>
+        <div class="stat-icon"><i class="bi bi-qr-code-scan"></i></div>
         <div class="stat-label">Total QR</div>
         <div class="stat-value mono text-accent">Bs {{ number_format($todayQr, 2) }}</div>
         <div class="stat-note">recaudado {{ $label }}</div>
     </div>
     <div class="stat-card">
-        <div class="stat-icon">💰</div>
+        <div class="stat-icon"><i class="bi bi-currency-dollar"></i></div>
         <div class="stat-label">Total General</div>
         <div class="stat-value mono text-success">Bs {{ number_format($todayTotal, 2) }}</div>
         <div class="stat-note">efectivo + QR</div>
@@ -164,7 +165,7 @@
                 $shiftCount = $shift->completed_sales_count ?? 0;
                 $duration   = $shift->start_time->diffForHumans(null, true);
             @endphp
-            <div style="padding:.75rem; background:rgba(79,142,247,.05); border-radius:8px; border:1px solid var(--border); margin-bottom:.75rem;">
+            <div style="padding:.75rem; background:rgba(29,106,150,.05); border-radius:8px; border:1px solid var(--border); margin-bottom:.75rem;">
                 <div class="flex items-center gap-3" style="margin-bottom:.5rem;">
                     <div class="user-avatar" style="background:var(--success);">
                         {{ strtoupper(substr($shift->user->name, 0, 2)) }}
@@ -179,13 +180,13 @@
                     </div>
                 </div>
                 <div class="flex gap-3" style="font-size:.72rem; color:var(--muted);">
-                    <span>💵 Bs {{ number_format($shiftCash, 2) }}</span>
-                    <span>📱 Bs {{ number_format($shiftQr, 2) }}</span>
+                    <span><i class="bi bi-cash-stack"></i> Bs {{ number_format($shiftCash, 2) }}</span>
+                    <span><i class="bi bi-qr-code-scan"></i> Bs {{ number_format($shiftQr, 2) }}</span>
                 </div>
             </div>
         @empty
             <div class="text-center text-muted" style="padding:2rem 0;">
-                <div style="font-size:2rem; margin-bottom:.5rem;">⏸</div>
+                <div style="font-size:2rem; margin-bottom:.5rem;"><i class="bi bi-pause-circle"></i></div>
                 <div>No hay turnos abiertos</div>
             </div>
         @endforelse
@@ -218,8 +219,8 @@
                         <div style="height:100%; width:{{ $pct }}%; background:var(--accent); border-radius:3px;"></div>
                     </div>
                     <div class="flex gap-3" style="font-size:.72rem; color:var(--muted); margin-top:.25rem;">
-                        <span>💵 Bs {{ number_format($row->cash_total, 2) }}</span>
-                        <span>📱 Bs {{ number_format($row->qr_total, 2) }}</span>
+                        <span><i class="bi bi-cash-stack"></i> Bs {{ number_format($row->cash_total, 2) }}</span>
+                        <span><i class="bi bi-qr-code-scan"></i> Bs {{ number_format($row->qr_total, 2) }}</span>
                         <span>{{ $row->sale_count }} ventas</span>
                     </div>
                 </div>
@@ -240,7 +241,7 @@
                 @php $pct = round(($product->units_sold / $maxUnits) * 100); @endphp
                 <div style="margin-bottom:.85rem;">
                     <div class="flex items-center gap-2" style="margin-bottom:.25rem;">
-                        <span class="mono" style="font-size:.7rem; width:1.4rem; height:1.4rem; display:flex; align-items:center; justify-content:center; background:rgba(79,142,247,.12); border-radius:50%; color:var(--accent); font-weight:700; flex-shrink:0;">{{ $i + 1 }}</span>
+                        <span class="mono" style="font-size:.7rem; width:1.4rem; height:1.4rem; display:flex; align-items:center; justify-content:center; background:rgba(29,106,150,.12); border-radius:50%; color:var(--accent); font-weight:700; flex-shrink:0;">{{ $i + 1 }}</span>
                         <span class="text-sm font-bold" style="flex:1;">{{ $product->name }}</span>
                         <span class="mono text-xs text-muted">{{ $product->units_sold }} u.</span>
                         <span class="mono text-sm text-success">Bs {{ number_format($product->revenue, 2) }}</span>
