@@ -12,8 +12,11 @@ use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\AdminAuditController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Public\HomeController;
+
+
 // ── Ruta raíz ───────────────────────────────────────────────────
-Route::get('/', fn() => redirect()->route('login'));
+Route::get('/', [\App\Http\Controllers\Public\HomeController::class, 'index'])->name('home');
 
 // ── Auth ─────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {
