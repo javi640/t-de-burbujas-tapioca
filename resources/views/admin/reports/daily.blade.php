@@ -1,27 +1,28 @@
 @extends('layouts.app')
 @section('title', 'Reporte de Cierre Diario')
 
+
 @section('sidebar-nav')
     <span class="nav-section-label">Principal</span>
     <a href="{{ route('admin.dashboard') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span> Dashboard
+        <span class="nav-icon"><i class="bi bi-grid-fill"></i></span> Dashboard
     </a>
     <span class="nav-section-label">Gestión</span>
     <a href="{{ route('admin.users.index') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Usuarios
+        <span class="nav-icon"><i class="bi bi-people-fill"></i></span> Usuarios
     </a>
     <a href="{{ route('admin.sales.index') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></span> Historial Ventas
+        <span class="nav-icon"><i class="bi bi-receipt"></i></span> Historial Ventas
     </a>
     <a href="{{ route('admin.shifts.index') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Turnos
+        <span class="nav-icon"><i class="bi bi-clock-fill"></i></span> Turnos
     </a>
     <span class="nav-section-label">Reportes</span>
     <a href="{{ route('admin.reports.daily') }}" class="nav-item active">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Cierre Diario
+        <span class="nav-icon"><i class="bi bi-file-earmark-text"></i></span> Cierre Diario
     </a>
     <a href="{{ route('admin.audit.index') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> Auditoría
+        <span class="nav-icon"><i class="bi bi-search"></i></span> Auditoría
     </a>
 @endsection
 
@@ -55,7 +56,7 @@
         <button type="submit" class="btn btn-primary btn-sm">Ver</button>
     </form>
     {{-- Botón imprimir --}}
-    <button onclick="window.print()" class="btn btn-ghost btn-sm">🖨 Imprimir</button>
+    <button onclick="window.print()" class="btn btn-ghost btn-sm"><i class="bi bi-printer"></i> Imprimir</button>
 @endsection
 
 @section('content')
@@ -67,7 +68,7 @@
 @if($shifts->isEmpty())
     {{-- ── Sin datos para la fecha ──────────────────────────────── --}}
     <div class="card" style="text-align:center; padding:3rem;">
-        <div style="font-size:2.5rem; margin-bottom:1rem;">📋</div>
+        <div style="font-size:2.5rem; margin-bottom:1rem;"><i class="bi bi-clipboard"></i></div>
         <div class="card-title" style="margin-bottom:.5rem;">Sin turnos cerrados</div>
         <div class="text-muted">No hay turnos cerrados registrados para el {{ $date->format('d/m/Y') }}.</div>
         <div class="text-muted text-sm" style="margin-top:.5rem;">Seleccioná otra fecha en el selector de arriba.</div>
@@ -127,17 +128,17 @@
     <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.5rem;">
         <div style="text-align:center; padding:1rem; background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.2); border-radius:10px;">
             <div style="font-size:1.75rem; font-weight:700; color:var(--success); font-family:'DM Mono',monospace;">{{ $decisionSummary['ok'] }}</div>
-            <div style="font-size:.75rem; color:var(--success); font-weight:600; margin-top:.25rem;">✓ Sin inconsistencia</div>
+            <div style="font-size:.75rem; color:var(--success); font-weight:600; margin-top:.25rem;"><i class="bi bi-check-circle-fill"></i> Sin inconsistencia</div>
             <div style="font-size:.68rem; color:var(--muted); margin-top:.15rem;">Diferencia = Bs 0.00</div>
         </div>
         <div style="text-align:center; padding:1rem; background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.2); border-radius:10px;">
             <div style="font-size:1.75rem; font-weight:700; color:var(--warning); font-family:'DM Mono',monospace;">{{ $decisionSummary['leve'] }}</div>
-            <div style="font-size:.75rem; color:var(--warning); font-weight:600; margin-top:.25rem;">⚠ Inconsistencia leve</div>
+            <div style="font-size:.75rem; color:var(--warning); font-weight:600; margin-top:.25rem;"><i class="bi bi-exclamation-triangle-fill"></i> Inconsistencia leve</div>
             <div style="font-size:.68rem; color:var(--muted); margin-top:.15rem;">Diferencia ≤ Bs 20.00</div>
         </div>
         <div style="text-align:center; padding:1rem; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2); border-radius:10px;">
             <div style="font-size:1.75rem; font-weight:700; color:var(--danger); font-family:'DM Mono',monospace;">{{ $decisionSummary['critica'] }}</div>
-            <div style="font-size:.75rem; color:var(--danger); font-weight:600; margin-top:.25rem;">✕ Inconsistencia crítica</div>
+            <div style="font-size:.75rem; color:var(--danger); font-weight:600; margin-top:.25rem;"><i class="bi bi-x-circle-fill"></i> Inconsistencia crítica</div>
             <div style="font-size:.68rem; color:var(--muted); margin-top:.15rem;">Diferencia > Bs 20.00</div>
         </div>
     </div>
@@ -148,7 +149,7 @@
             <div style="padding-left:1.5rem;">
                 <span style="color:var(--success);">├── NO</span>
                 <span style="color:var(--muted);"> → </span>
-                <span style="background:rgba(34,197,94,.15); color:var(--success); padding:.1rem .5rem; border-radius:4px; font-size:.72rem;">✓ SIN INCONSISTENCIA</span>
+                <span style="background:rgba(34,197,94,.15); color:var(--success); padding:.1rem .5rem; border-radius:4px; font-size:.72rem;"><i class="bi bi-check-circle-fill"></i> SIN INCONSISTENCIA</span>
             </div>
             <div style="padding-left:1.5rem;">
                 <span style="color:var(--danger);">└── SÍ</span>
@@ -161,12 +162,12 @@
             <div style="padding-left:5.5rem;">
                 <span style="color:var(--danger);">├── SÍ</span>
                 <span style="color:var(--muted);"> → </span>
-                <span style="background:rgba(239,68,68,.15); color:var(--danger); padding:.1rem .5rem; border-radius:4px; font-size:.72rem;">✕ INCONSISTENCIA CRÍTICA</span>
+                <span style="background:rgba(239,68,68,.15); color:var(--danger); padding:.1rem .5rem; border-radius:4px; font-size:.72rem;"><i class="bi bi-x-circle-fill"></i> INCONSISTENCIA CRÍTICA</span>
             </div>
             <div style="padding-left:5.5rem;">
                 <span style="color:var(--warning);">└── NO</span>
                 <span style="color:var(--muted);"> → </span>
-                <span style="background:rgba(245,158,11,.15); color:var(--warning); padding:.1rem .5rem; border-radius:4px; font-size:.72rem;">⚠ INCONSISTENCIA LEVE</span>
+                <span style="background:rgba(245,158,11,.15); color:var(--warning); padding:.1rem .5rem; border-radius:4px; font-size:.72rem;"><i class="bi bi-exclamation-triangle-fill"></i> INCONSISTENCIA LEVE</span>
             </div>
             <div style="padding-left:3.5rem;">
                 <span style="color:var(--warning);">└── NO (alta > Bs 20)</span>
@@ -179,12 +180,12 @@
             <div style="padding-left:7.5rem;">
                 <span style="color:var(--warning);">├── SÍ</span>
                 <span style="color:var(--muted);"> → </span>
-                <span style="background:rgba(245,158,11,.15); color:var(--warning); padding:.1rem .5rem; border-radius:4px; font-size:.72rem;">⚠ INCONSISTENCIA LEVE</span>
+                <span style="background:rgba(245,158,11,.15); color:var(--warning); padding:.1rem .5rem; border-radius:4px; font-size:.72rem;"><i class="bi bi-exclamation-triangle-fill"></i> INCONSISTENCIA LEVE</span>
             </div>
             <div style="padding-left:7.5rem;">
                 <span style="color:var(--danger);">└── NO</span>
                 <span style="color:var(--muted);"> → </span>
-                <span style="background:rgba(239,68,68,.15); color:var(--danger); padding:.1rem .5rem; border-radius:4px; font-size:.72rem;">✕ INCONSISTENCIA CRÍTICA</span>
+                <span style="background:rgba(239,68,68,.15); color:var(--danger); padding:.1rem .5rem; border-radius:4px; font-size:.72rem;"><i class="bi bi-x-circle-fill"></i> INCONSISTENCIA CRÍTICA</span>
             </div>
             <div style="padding-left:5.5rem;">
                 <span style="color:var(--warning);">└── NO (sobrante)</span>
@@ -266,35 +267,35 @@
                 <div>
                     <div style="font-size:.68rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:.75rem;">Arqueo de caja</div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-bottom:.75rem;">
-                        <div style="background:rgba(10,15,30,.3); border-radius:8px; padding:.75rem;">
+                        <div style="background:rgba(184,204,202,.15); border-radius:8px; padding:.75rem;">
                             <div style="font-size:.65rem; color:var(--muted); margin-bottom:.25rem;">Ef. inicial</div>
                             <div class="mono" style="font-size:.9rem;">Bs {{ number_format($shift->initial_cash, 2) }}</div>
                         </div>
-                        <div style="background:rgba(10,15,30,.3); border-radius:8px; padding:.75rem;">
+                        <div style="background:rgba(184,204,202,.15); border-radius:8px; padding:.75rem;">
                             <div style="font-size:.65rem; color:var(--muted); margin-bottom:.25rem;">Ventas efectivo</div>
                             <div class="mono" style="font-size:.9rem;">Bs {{ number_format($shiftSalesCash, 2) }}</div>
                         </div>
-                        <div style="background:rgba(10,15,30,.3); border-radius:8px; padding:.75rem;">
+                        <div style="background:rgba(184,204,202,.15); border-radius:8px; padding:.75rem;">
                             <div style="font-size:.65rem; color:var(--muted); margin-bottom:.25rem;">Egresos</div>
                             <div class="mono text-danger" style="font-size:.9rem;">− Bs {{ number_format($shiftExpenses, 2) }}</div>
                         </div>
-                        <div style="background:rgba(10,15,30,.3); border-radius:8px; padding:.75rem;">
+                        <div style="background:rgba(184,204,202,.15); border-radius:8px; padding:.75rem;">
                             <div style="font-size:.65rem; color:var(--muted); margin-bottom:.25rem;">Ing. extra</div>
                             <div class="mono text-warning" style="font-size:.9rem;">+ Bs {{ number_format($shiftIncomes, 2) }}</div>
                         </div>
                     </div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:.5rem;">
-                        <div style="background:rgba(10,15,30,.4); border-radius:8px; padding:.75rem; border:1px solid rgba(79,142,247,.2);">
+                        <div style="background:rgba(184,204,202,.2); border-radius:8px; padding:.75rem; border:1px solid rgba(79,142,247,.2);">
                             <div style="font-size:.65rem; color:var(--muted); margin-bottom:.25rem;">Esperado</div>
                             <div class="mono text-accent" style="font-size:1.1rem; font-weight:700;">Bs {{ number_format($expected, 2) }}</div>
                         </div>
-                        <div style="background:rgba(10,15,30,.4); border-radius:8px; padding:.75rem; border:1px solid {{ $borderColor }};">
+                        <div style="background:rgba(184,204,202,.2); border-radius:8px; padding:.75rem; border:1px solid {{ $borderColor }};">
                             <div style="font-size:.65rem; color:var(--muted); margin-bottom:.25rem;">Declarado</div>
                             <div class="mono" style="font-size:1.1rem; font-weight:700; color:var(--{{ $decision['color'] }});">Bs {{ number_format($reported, 2) }}</div>
                         </div>
                     </div>
                     {{-- Diferencia destacada --}}
-                    <div style="margin-top:.5rem; padding:.6rem .75rem; border-radius:8px; background:rgba(10,15,30,.3); border:1px solid {{ $borderColor }}; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="margin-top:.5rem; padding:.6rem .75rem; border-radius:8px; background:rgba(184,204,202,.15); border:1px solid {{ $borderColor }}; display:flex; justify-content:space-between; align-items:center;">
                         <span style="font-size:.75rem; color:var(--muted);">Diferencia ({{ $decision['type'] }})</span>
                         <span class="mono" style="font-size:1rem; font-weight:700; color:var(--{{ $decision['color'] }});">
                             Bs {{ number_format($shift->cash_difference, 2) }}
@@ -307,7 +308,7 @@
                     <div style="font-size:.68rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:.75rem;">Decisión del árbol</div>
 
                     {{-- Recorrido del árbol para este turno --}}
-                    <div style="background:rgba(10,15,30,.4); border-radius:8px; padding:.85rem; margin-bottom:.75rem; font-family:'DM Mono',monospace; font-size:.72rem; line-height:1.9;">
+                    <div style="background:rgba(184,204,202,.2); border-radius:8px; padding:.85rem; margin-bottom:.75rem; font-family:'DM Mono',monospace; font-size:.72rem; line-height:1.9;">
                         @foreach($decision['decision_path'] as $pregunta => $respuesta)
                             <div>
                                 <span style="color:var(--muted);">{{ $pregunta }}</span>
@@ -333,7 +334,7 @@
                         padding:.75rem;
                         border-radius:8px;
                         border-left:3px solid var(--{{ $decision['color'] }});
-                        background:rgba(10,15,30,.3);
+                        background:rgba(184,204,202,.15);
                         font-size:.75rem;
                         line-height:1.6;
                         color:var(--text);
@@ -346,12 +347,12 @@
 
                     {{-- Mini stats ventas --}}
                     <div class="flex gap-3" style="margin-top:.75rem; font-size:.72rem; color:var(--muted);">
-                        <span>🛒 {{ $shiftSalesCount }} ventas</span>
-                        <span>📱 Bs {{ number_format($shiftSalesQr, 2) }} QR</span>
+                        <span><i class="bi bi-cart3"></i> {{ $shiftSalesCount }} ventas</span>
+                        <span><i class="bi bi-qr-code-scan"></i> Bs {{ number_format($shiftSalesQr, 2) }} QR</span>
                     </div>
                     @if($shift->notes)
                         <div style="margin-top:.5rem; font-size:.72rem; color:var(--muted); font-style:italic;">
-                            📝 "{{ $shift->notes }}"
+                            <i class="bi bi-pencil-square"></i> "{{ $shift->notes }}"
                         </div>
                     @endif
                 </div>
@@ -377,7 +378,7 @@
                             </thead>
                             <tbody>
                                 @foreach($shift->sales as $sale)
-                                    <tr style="border-bottom:1px solid rgba(42,53,72,.4);">
+                                    <tr style="border-bottom:1px solid rgba(184,204,202,.5);">
                                         <td style="padding:.5rem .75rem;" class="mono text-xs">{{ $sale->sale_time->format('H:i') }}</td>
                                         <td style="padding:.5rem .75rem;" class="text-xs text-muted">
                                             {{ $sale->details->map(fn($d) => $d->quantity.'× '.$d->product->name)->join(', ') }}
@@ -418,7 +419,7 @@
             @php $pct = round(($product->units_sold / $maxUnits) * 100); @endphp
             <div style="margin-bottom:.85rem;">
                 <div class="flex items-center gap-2" style="margin-bottom:.3rem;">
-                    <span class="mono" style="font-size:.7rem; width:1.4rem; height:1.4rem; display:flex; align-items:center; justify-content:center; background:rgba(79,142,247,.12); border-radius:50%; color:var(--accent); font-weight:700; flex-shrink:0;">{{ $i+1 }}</span>
+                    <span class="mono" style="font-size:.7rem; width:1.4rem; height:1.4rem; display:flex; align-items:center; justify-content:center; background:rgba(29,106,150,.12); border-radius:50%; color:var(--accent); font-weight:700; flex-shrink:0;">{{ $i+1 }}</span>
                     <span class="text-sm font-bold" style="flex:1;">{{ $product->name }}</span>
                     <span class="mono text-xs text-muted">{{ $product->units_sold }} u.</span>
                     <span class="mono text-sm text-success">Bs {{ number_format($product->revenue, 2) }}</span>
@@ -496,7 +497,7 @@
                                 0 u.
                             </td>
                             <td style="text-align:center;">
-                                <span class="badge badge-success">✓ OK</span>
+                                <span class="badge badge-success"><i class="bi bi-check-circle-fill"></i> OK</span>
                             </td>
                         </tr>
                     @empty

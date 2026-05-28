@@ -1,30 +1,31 @@
 @extends('layouts.app')
 @section('title', 'Conciliación de Stock')
 
+
 @section('sidebar-nav')
     <span class="nav-section-label">Principal</span>
     <a href="{{ route('admin.dashboard') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span> Dashboard
+        <span class="nav-icon"><i class="bi bi-grid-fill"></i></span> Dashboard
     </a>
     <span class="nav-section-label">Gestión</span>
     <a href="{{ route('admin.users.index') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Usuarios
+        <span class="nav-icon"><i class="bi bi-people-fill"></i></span> Usuarios
     </a>
     <a href="{{ route('admin.sales.index') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></span> Historial Ventas
+        <span class="nav-icon"><i class="bi bi-receipt"></i></span> Historial Ventas
     </a>
     <a href="{{ route('admin.shifts.index') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Turnos
+        <span class="nav-icon"><i class="bi bi-clock-fill"></i></span> Turnos
     </a>
     <span class="nav-section-label">Reportes</span>
     <a href="{{ route('admin.reports.daily') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Cierre Diario
+        <span class="nav-icon"><i class="bi bi-file-earmark-text"></i></span> Cierre Diario
     </a>
     <a href="{{ route('admin.reports.stock') }}" class="nav-item active">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span> Conciliación Stock
+        <span class="nav-icon"><i class="bi bi-box-seam"></i></span> Conciliación Stock
     </a>
     <a href="{{ route('admin.audit.index') }}" class="nav-item">
-        <span class="nav-icon" style="display:inline-flex;align-items:center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> Auditoría
+        <span class="nav-icon"><i class="bi bi-search"></i></span> Auditoría
     </a>
 @endsection
 
@@ -40,7 +41,7 @@
         <button type="submit" class="btn btn-primary btn-sm">Ver</button>
     </form>
     <button onclick="window.print()" class="btn btn-ghost btn-sm">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        
         Imprimir
     </button>
 @endsection
@@ -53,7 +54,7 @@
 
 @if($shifts->isEmpty())
     <div class="card" style="text-align:center; padding:3rem;">
-        <div style="font-size:2.5rem; margin-bottom:1rem;">📦</div>
+        <div style="font-size:2.5rem; margin-bottom:1rem;"><i class="bi bi-box-seam"></i></div>
         <div class="card-title" style="margin-bottom:.5rem;">Sin turnos cerrados</div>
         <div class="text-muted">No hay turnos cerrados para el {{ $date->format('d/m/Y') }}.</div>
     </div>
@@ -100,7 +101,7 @@
     <div class="card-header">
         <div>
             <div class="card-title">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                
                 Conciliación por producto
             </div>
             <div class="card-subtitle">Comparación de salida física vs ventas registradas en el sistema</div>
@@ -137,9 +138,9 @@
                         </td>
                         <td style="text-align:center;">
                             @if($diff == 0)
-                                <span class="badge badge-success">✓ OK</span>
+                                <span class="badge badge-success"><i class="bi bi-check-circle-fill"></i> OK</span>
                             @elseif($diff > 0)
-                                <span class="badge badge-danger">⚠ Faltante</span>
+                                <span class="badge badge-danger"><i class="bi bi-exclamation-triangle-fill"></i> Faltante</span>
                             @else
                                 <span class="badge badge-warning">↑ Sobrante</span>
                             @endif
