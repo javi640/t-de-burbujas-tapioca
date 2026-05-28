@@ -148,7 +148,28 @@
             </tbody>
         </table>
     </div>
-    <div style="margin-top: 1rem;">{{ $sales->withQueryString()->links() }}</div>
+    <div style="margin-top:1rem; display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;">
+        @if($sales->onFirstPage())
+            <span style="padding:.35rem .75rem; border-radius:6px; background:var(--surface); border:1px solid var(--border); color:var(--muted); font-size:.8rem; cursor:not-allowed;">← Anterior</span>
+        @else
+            <a href="{{ $sales->withQueryString()->previousPageUrl() }}" style="padding:.35rem .75rem; border-radius:6px; background:var(--surface); border:1px solid var(--border); color:var(--text); font-size:.8rem; text-decoration:none;">← Anterior</a>
+        @endif
+        @foreach($sales->withQueryString()->getUrlRange(max(1, $sales->currentPage()-2), min($sales->lastPage(), $sales->currentPage()+2)) as $page => $url)
+            @if($page == $sales->currentPage())
+                <span style="padding:.35rem .6rem; border-radius:6px; background:var(--accent); color:#fff; font-size:.8rem; font-weight:600; min-width:2rem; text-align:center;">{{ $page }}</span>
+            @else
+                <a href="{{ $url }}" style="padding:.35rem .6rem; border-radius:6px; background:var(--surface); border:1px solid var(--border); color:var(--text); font-size:.8rem; text-decoration:none; min-width:2rem; text-align:center;">{{ $page }}</a>
+            @endif
+        @endforeach
+        @if($sales->hasMorePages())
+            <a href="{{ $sales->withQueryString()->nextPageUrl() }}" style="padding:.35rem .75rem; border-radius:6px; background:var(--surface); border:1px solid var(--border); color:var(--text); font-size:.8rem; text-decoration:none;">Siguiente →</a>
+        @else
+            <span style="padding:.35rem .75rem; border-radius:6px; background:var(--surface); border:1px solid var(--border); color:var(--muted); font-size:.8rem; cursor:not-allowed;">Siguiente →</span>
+        @endif
+        <span style="font-size:.75rem; color:var(--muted); margin-left:.5rem;">
+            Mostrando {{ $sales->firstItem() }}–{{ $sales->lastItem() }} de {{ $sales->total() }} registros
+        </span>
+    </div>
 </div>
 
 {{-- Modal de anulación --}}
