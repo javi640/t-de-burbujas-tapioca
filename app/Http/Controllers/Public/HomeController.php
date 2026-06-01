@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -16,6 +17,11 @@ class HomeController extends Controller
      */
     public function index(): View
     {
-        return view('public.home');
+        $products = Product::active()
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get();
+
+        return view('public.home', compact('products'));
     }
 }

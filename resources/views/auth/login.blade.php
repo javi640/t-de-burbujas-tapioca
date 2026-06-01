@@ -243,6 +243,36 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* ── Back to home ──────────────────────────── */
+        .btn-back-home {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            background: rgba(255,255,255,.08);
+            color: var(--c-fog);
+            text-decoration: none;
+            padding: .55rem 1.1rem;
+            border-radius: 24px;
+            font-size: .85rem;
+            font-weight: 500;
+            border: 1px solid rgba(133,184,203,.25);
+            transition: all .2s;
+            z-index: 10;
+            backdrop-filter: blur(6px);
+        }
+
+        .btn-back-home:hover {
+            background: var(--c-ocean);
+            color: #fff;
+            border-color: var(--c-ocean);
+            transform: translateX(-2px);
+        }
+
+        .btn-back-home i { font-size: 1rem; }
+
         /* ── Responsive ────────────────────────────── */
         @media (max-width: 768px) {
             .login-wrapper { max-width: 350px; padding: .8rem; }
@@ -260,6 +290,10 @@
     </style>
 </head>
 <body>
+    <a href="{{ route('home') }}" class="btn-back-home">
+        <i class="bi bi-arrow-left"></i> Volver al inicio
+    </a>
+
     <div class="login-wrapper">
 
         <div class="logo-area">

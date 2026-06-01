@@ -619,40 +619,40 @@
         .location-map {
             background: var(--deep);
             height: 280px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 0;
+            display: block;
             position: relative;
             overflow: hidden;
         }
 
-        .location-map::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: repeating-linear-gradient(
-                0deg, rgba(133,184,203,.04) 0px, rgba(133,184,203,.04) 1px, transparent 1px, transparent 40px),
-                repeating-linear-gradient(
-                90deg, rgba(133,184,203,.04) 0px, rgba(133,184,203,.04) 1px, transparent 1px, transparent 40px);
+        .location-map iframe {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0;
         }
 
-        .map-pin {
-            width: 56px; height: 56px;
-            background: var(--ocean);
-            border-radius: 50% 50% 50% 0;
-            transform: rotate(-45deg);
-            display: flex;
+        .btn-directions {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 24px rgba(29,106,150,.4);
-            animation: pulse 2s ease-in-out infinite;
+            gap: .5rem;
+            background: var(--ocean);
+            color: #fff;
+            text-decoration: none;
+            padding: .65rem 1.25rem;
+            border-radius: 20px;
+            font-size: .85rem;
+            font-weight: 600;
+            transition: all .2s;
+            margin-top: .25rem;
+            margin-bottom: 1.25rem;
         }
 
-        .map-pin i { transform: rotate(45deg); color: #fff; font-size: 1.3rem; }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 8px 24px rgba(29,106,150,.4); }
-            50%       { box-shadow: 0 8px 40px rgba(29,106,150,.7); }
+        .btn-directions:hover {
+            background: var(--deep);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40,59,66,.2);
         }
 
         .location-info { padding: 2rem 2.5rem; }
@@ -815,6 +815,144 @@
             color: rgba(209,221,219,.3);
         }
 
+        /* ── Hours ─────────────────────────────── */
+        .hours { background: var(--white); }
+
+        .hours-card {
+            background: var(--cream);
+            border: 1px solid rgba(133,184,203,.25);
+            border-radius: 20px;
+            padding: 2.2rem 2rem;
+            max-width: 480px;
+            box-shadow: 0 12px 40px rgba(40,59,66,.06);
+        }
+
+        .hours-status {
+            text-align: center;
+            margin-bottom: 1.6rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: .95rem;
+            font-weight: 700;
+            padding: .55rem 1.4rem;
+            border-radius: 24px;
+            letter-spacing: .03em;
+        }
+
+        .status-badge.is-open {
+            background: rgba(34,197,94,.12);
+            color: #16a34a;
+            border: 1px solid rgba(34,197,94,.35);
+        }
+
+        .status-badge.is-closed {
+            background: rgba(239,68,68,.1);
+            color: #dc2626;
+            border: 1px solid rgba(239,68,68,.3);
+        }
+
+        .hours-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .hours-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: .7rem 1rem;
+            border-radius: 10px;
+            font-size: .92rem;
+            transition: background .15s;
+        }
+
+        .hours-row + .hours-row {
+            border-top: 1px solid rgba(133,184,203,.18);
+        }
+
+        .hours-day {
+            font-weight: 500;
+            color: var(--deep);
+        }
+
+        .hours-time {
+            font-family: 'DM Mono', monospace;
+            font-weight: 500;
+            color: var(--ocean);
+        }
+
+        .hours-row.is-today {
+            background: rgba(29,106,150,.08);
+            border-top-color: transparent;
+        }
+
+        .hours-row.is-today + .hours-row {
+            border-top-color: transparent;
+        }
+
+        .hours-row.is-today .hours-day {
+            color: var(--ocean);
+            font-weight: 700;
+        }
+
+        .hours-row.is-today .hours-day::before {
+            content: '★ ';
+            color: var(--ocean);
+            font-size: .85em;
+        }
+
+        /* ── WhatsApp float (HU-25) ───────────── */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 24px; right: 24px;
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            background: #25D366;
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.9rem;
+            box-shadow: 0 8px 24px rgba(37,211,102,.4);
+            z-index: 999;
+            transition: all .25s;
+            text-decoration: none;
+            animation: wa-pulse 2.5s ease-in-out infinite;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            color: #fff;
+            box-shadow: 0 12px 32px rgba(37,211,102,.55);
+        }
+
+        @keyframes wa-pulse {
+            0%, 100% { box-shadow: 0 8px 24px rgba(37,211,102,.4); }
+            50%      { box-shadow: 0 8px 32px rgba(37,211,102,.7), 0 0 0 12px rgba(37,211,102,.1); }
+        }
+
+        /* ── Consult button (HU-26) ───────────── */
+        .btn-consult {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            background: #25D366;
+            color: #fff !important;
+            border: none;
+            padding: .45rem .9rem;
+            border-radius: 20px;
+            font-size: .78rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all .2s;
+        }
+
+        .btn-consult:hover { background: #1da851; transform: translateY(-2px); }
+        .btn-consult i { font-size: .95rem; }
+
         /* ── Responsive ────────────────────────── */
         @media (max-width: 991px) {
             .about-tag.t1, .about-tag.t2 { display: none; }
@@ -827,6 +965,15 @@
             .hero-visual { margin-top: 2.5rem; }
             .hero-cup { width: 160px; }
             .location-info { padding: 1.5rem; }
+            .hours-card { padding: 1.6rem 1.2rem; }
+        }
+
+        @media (max-width: 576px) {
+            .whatsapp-float {
+                width: 54px; height: 54px;
+                font-size: 1.7rem;
+                bottom: 18px; right: 18px;
+            }
         }
     </style>
 </head>
@@ -848,6 +995,7 @@
                     <li class="nav-item"><a class="nav-link" href="#about">Nosotros</a></li>
                     <li class="nav-item"><a class="nav-link" href="#menu">Menú</a></li>
                     <li class="nav-item"><a class="nav-link" href="#why">¿Por qué elegirnos?</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#hours">Horarios</a></li>
                     <li class="nav-item"><a class="nav-link" href="#location">Ubicación</a></li>
                     <li class="nav-item ms-2"><a class="nav-link btn-nav" href="{{ route('login') }}">Iniciar sesión</a></li>
                 </ul>
@@ -1041,168 +1189,51 @@
                 </div>
                 <div class="col-lg-auto mt-3 mt-lg-0">
                     <div class="menu-filter">
-                        <button class="filter-btn active">Todos</button>
-                        <button class="filter-btn">Clásicos</button>
-                        <button class="filter-btn">Frutas</button>
-                        <button class="filter-btn">Especiales</button>
+                        <button class="filter-btn active" data-filter="all">Todos</button>
+                        <button class="filter-btn" data-filter="BEBIDA">Bebidas</button>
+                        <button class="filter-btn" data-filter="TOPPING">Toppings</button>
                     </div>
                 </div>
             </div>
 
             <div class="row g-4">
-                <!-- Card 1 -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="menu-card">
-                        <div class="menu-card-img" style="background: linear-gradient(135deg,#e8d5c8,#c4a882);">
-                            <svg class="cup-mini" viewBox="0 0 120 170" fill="none">
-                                <rect x="52" y="2" width="7" height="48" rx="3.5" fill="#85B8CB" opacity=".8"/>
-                                <path d="M16 50 L24 155 Q24 161 30 161 H90 Q96 161 96 155 L104 50 Z" fill="#6b4c38"/>
-                                <path d="M18 62 L24 155 Q24 160 30 160 H90 Q96 160 96 155 L102 62 Z" fill="#c4824a" opacity=".8"/>
-                                <ellipse cx="60" cy="62" rx="43" ry="7" fill="#e8a870" opacity=".6"/>
-                                <circle cx="44" cy="136" r="8" fill="#3d2a1a"/><circle cx="60" cy="143" r="9" fill="#3d2a1a"/><circle cx="76" cy="135" r="8" fill="#3d2a1a"/>
-                                <circle cx="41" cy="132" r="2.5" fill="white" opacity=".2"/>
-                                <ellipse cx="60" cy="50" rx="44" ry="8.5" fill="#D1DDDB"/>
-                            </svg>
-                            <span class="menu-badge">Popular</span>
-                        </div>
-                        <div class="menu-card-body">
-                            <div class="menu-card-name">Brown Sugar Boba</div>
-                            <div class="menu-card-desc">Té negro con leche, perlas de tapioca en sirope de azúcar moreno y canela. Un clásico reconfortante.</div>
-                            <div class="menu-card-footer">
-                                <div class="menu-price">Bs 18</div>
-                                <button class="btn-add"><i class="bi bi-plus-lg"></i></button>
+                @forelse ($products as $product)
+                    <div class="col-lg-4 col-md-6" data-category="{{ $product->category }}">
+                        <div class="menu-card">
+                            <div class="menu-card-img" style="background: linear-gradient(135deg,#e8d5c8,#c4a882);">
+                                <svg class="cup-mini" viewBox="0 0 120 170" fill="none">
+                                    <rect x="52" y="2" width="7" height="48" rx="3.5" fill="#85B8CB" opacity=".8"/>
+                                    <path d="M16 50 L24 155 Q24 161 30 161 H90 Q96 161 96 155 L104 50 Z" fill="#6b4c38"/>
+                                    <path d="M18 62 L24 155 Q24 160 30 160 H90 Q96 160 96 155 L102 62 Z" fill="#c4824a" opacity=".8"/>
+                                    <ellipse cx="60" cy="62" rx="43" ry="7" fill="#e8a870" opacity=".6"/>
+                                    <circle cx="44" cy="136" r="8" fill="#3d2a1a"/><circle cx="60" cy="143" r="9" fill="#3d2a1a"/><circle cx="76" cy="135" r="8" fill="#3d2a1a"/>
+                                    <circle cx="41" cy="132" r="2.5" fill="white" opacity=".2"/>
+                                    <ellipse cx="60" cy="50" rx="44" ry="8.5" fill="#D1DDDB"/>
+                                </svg>
+                                @if ($product->category === 'TOPPING')
+                                    <span class="menu-badge">Topping</span>
+                                @endif
+                            </div>
+                            <div class="menu-card-body">
+                                <div class="menu-card-name">{{ $product->name }}</div>
+                                <div class="menu-card-desc">Elaborado con ingredientes frescos. Consulta disponibilidad.</div>
+                                <div class="menu-card-footer">
+                                    <div class="menu-price">Bs {{ number_format($product->price, 0) }}</div>
+                                    <a href="https://wa.me/59172088603?text={{ urlencode('Hola, quiero consultar por: ' . $product->name) }}"
+                                       target="_blank" rel="noopener"
+                                       class="btn-consult"
+                                       aria-label="Consultar por {{ $product->name }} en WhatsApp">
+                                        <i class="bi bi-whatsapp"></i> Consultar
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="menu-card">
-                        <div class="menu-card-img" style="background: linear-gradient(135deg,#d8c5e8,#a876c4);">
-                            <svg class="cup-mini" viewBox="0 0 120 170" fill="none">
-                                <rect x="52" y="2" width="7" height="48" rx="3.5" fill="#85B8CB" opacity=".8"/>
-                                <path d="M16 50 L24 155 Q24 161 30 161 H90 Q96 161 96 155 L104 50 Z" fill="#4a3658"/>
-                                <path d="M18 62 L24 155 Q24 160 30 160 H90 Q96 160 96 155 L102 62 Z" fill="#8b5ca8" opacity=".85"/>
-                                <ellipse cx="60" cy="62" rx="43" ry="7" fill="#c490d8" opacity=".6"/>
-                                <circle cx="44" cy="136" r="8" fill="#2d1f3d"/><circle cx="60" cy="143" r="9" fill="#2d1f3d"/><circle cx="76" cy="135" r="8" fill="#2d1f3d"/>
-                                <circle cx="41" cy="132" r="2.5" fill="white" opacity=".2"/>
-                                <ellipse cx="60" cy="50" rx="44" ry="8.5" fill="#D1DDDB"/>
-                            </svg>
-                            <span class="menu-badge new">Nuevo</span>
-                        </div>
-                        <div class="menu-card-body">
-                            <div class="menu-card-name">Taro Latte</div>
-                            <div class="menu-card-desc">Cremoso latte de taro con leche de coco, perlas de tapioca negras y un toque de vainilla. Irresistible.</div>
-                            <div class="menu-card-footer">
-                                <div class="menu-price">Bs 20</div>
-                                <button class="btn-add"><i class="bi bi-plus-lg"></i></button>
-                            </div>
-                        </div>
+                @empty
+                    <div class="col-12 text-center" style="color:#5d7d84;font-size:.95rem;padding:2rem 0;">
+                        No hay productos disponibles por el momento.
                     </div>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="menu-card">
-                        <div class="menu-card-img" style="background: linear-gradient(135deg,#c8e8d0,#6ab87e);">
-                            <svg class="cup-mini" viewBox="0 0 120 170" fill="none">
-                                <rect x="52" y="2" width="7" height="48" rx="3.5" fill="#85B8CB" opacity=".8"/>
-                                <path d="M16 50 L24 155 Q24 161 30 161 H90 Q96 161 96 155 L104 50 Z" fill="#2d4a35"/>
-                                <path d="M18 62 L24 155 Q24 160 30 160 H90 Q96 160 96 155 L102 62 Z" fill="#4a8c5c" opacity=".85"/>
-                                <ellipse cx="60" cy="62" rx="43" ry="7" fill="#80c490" opacity=".6"/>
-                                <circle cx="44" cy="136" r="8" fill="#1a2e1f"/><circle cx="60" cy="143" r="9" fill="#1a2e1f"/><circle cx="76" cy="135" r="8" fill="#1a2e1f"/>
-                                <circle cx="41" cy="132" r="2.5" fill="white" opacity=".2"/>
-                                <ellipse cx="60" cy="50" rx="44" ry="8.5" fill="#D1DDDB"/>
-                            </svg>
-                        </div>
-                        <div class="menu-card-body">
-                            <div class="menu-card-name">Matcha con Perlas</div>
-                            <div class="menu-card-desc">Auténtico matcha japonés con leche, perlas de tapioca y un dulzor equilibrado. Energía natural.</div>
-                            <div class="menu-card-footer">
-                                <div class="menu-price">Bs 22</div>
-                                <button class="btn-add"><i class="bi bi-plus-lg"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 4 -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="menu-card">
-                        <div class="menu-card-img" style="background: linear-gradient(135deg,#fde8cc,#f5a84b);">
-                            <svg class="cup-mini" viewBox="0 0 120 170" fill="none">
-                                <rect x="52" y="2" width="7" height="48" rx="3.5" fill="#85B8CB" opacity=".8"/>
-                                <path d="M16 50 L24 155 Q24 161 30 161 H90 Q96 161 96 155 L104 50 Z" fill="#5a3810"/>
-                                <path d="M18 62 L24 155 Q24 160 30 160 H90 Q96 160 96 155 L102 62 Z" fill="#e8902a" opacity=".85"/>
-                                <ellipse cx="60" cy="62" rx="43" ry="7" fill="#f5c070" opacity=".6"/>
-                                <circle cx="44" cy="136" r="8" fill="#3a220a"/><circle cx="60" cy="143" r="9" fill="#3a220a"/><circle cx="76" cy="135" r="8" fill="#3a220a"/>
-                                <circle cx="41" cy="132" r="2.5" fill="white" opacity=".2"/>
-                                <ellipse cx="60" cy="50" rx="44" ry="8.5" fill="#D1DDDB"/>
-                            </svg>
-                        </div>
-                        <div class="menu-card-body">
-                            <div class="menu-card-name">Mango Tropical</div>
-                            <div class="menu-card-desc">Jugo natural de mango con perlas de tapioca, leche de coco y hielo. Frescura tropical en cada sorbo.</div>
-                            <div class="menu-card-footer">
-                                <div class="menu-price">Bs 19</div>
-                                <button class="btn-add"><i class="bi bi-plus-lg"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 5 -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="menu-card">
-                        <div class="menu-card-img" style="background: linear-gradient(135deg,#e8f0f8,#7aaed4);">
-                            <svg class="cup-mini" viewBox="0 0 120 170" fill="none">
-                                <rect x="52" y="2" width="7" height="48" rx="3.5" fill="#85B8CB" opacity=".8"/>
-                                <path d="M16 50 L24 155 Q24 161 30 161 H90 Q96 161 96 155 L104 50 Z" fill="#283B42"/>
-                                <path d="M18 62 L24 155 Q24 160 30 160 H90 Q96 160 96 155 L102 62 Z" fill="#1D6A96" opacity=".85"/>
-                                <ellipse cx="60" cy="62" rx="43" ry="7" fill="#85B8CB" opacity=".65"/>
-                                <circle cx="44" cy="136" r="8" fill="#1a2c32"/><circle cx="60" cy="143" r="9" fill="#1a2c32"/><circle cx="76" cy="135" r="8" fill="#1a2c32"/>
-                                <circle cx="41" cy="132" r="2.5" fill="white" opacity=".2"/>
-                                <ellipse cx="60" cy="50" rx="44" ry="8.5" fill="#D1DDDB"/>
-                            </svg>
-                            <span class="menu-badge">Favorito</span>
-                        </div>
-                        <div class="menu-card-body">
-                            <div class="menu-card-name">Té Azul con Perlas</div>
-                            <div class="menu-card-desc">Té de mariposa pea flower con limón, perlas de colores y jarabe de lavanda. Un espectáculo visual y delicioso.</div>
-                            <div class="menu-card-footer">
-                                <div class="menu-price">Bs 21</div>
-                                <button class="btn-add"><i class="bi bi-plus-lg"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 6 -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="menu-card">
-                        <div class="menu-card-img" style="background: linear-gradient(135deg,#fce8ec,#e8809a);">
-                            <svg class="cup-mini" viewBox="0 0 120 170" fill="none">
-                                <rect x="52" y="2" width="7" height="48" rx="3.5" fill="#85B8CB" opacity=".8"/>
-                                <path d="M16 50 L24 155 Q24 161 30 161 H90 Q96 161 96 155 L104 50 Z" fill="#5a2030"/>
-                                <path d="M18 62 L24 155 Q24 160 30 160 H90 Q96 160 96 155 L102 62 Z" fill="#d85070" opacity=".85"/>
-                                <ellipse cx="60" cy="62" rx="43" ry="7" fill="#f0a0b8" opacity=".6"/>
-                                <circle cx="44" cy="136" r="8" fill="#38101e"/><circle cx="60" cy="143" r="9" fill="#38101e"/><circle cx="76" cy="135" r="8" fill="#38101e"/>
-                                <circle cx="41" cy="132" r="2.5" fill="white" opacity=".2"/>
-                                <ellipse cx="60" cy="50" rx="44" ry="8.5" fill="#D1DDDB"/>
-                            </svg>
-                            <span class="menu-badge new">Nuevo</span>
-                        </div>
-                        <div class="menu-card-body">
-                            <div class="menu-card-name">Fresa & Lychee</div>
-                            <div class="menu-card-desc">Combinación irresistible de fresa fresca con lychee, perlas de tapioca cristal y leche de almendras.</div>
-                            <div class="menu-card-footer">
-                                <div class="menu-price">Bs 23</div>
-                                <button class="btn-add"><i class="bi bi-plus-lg"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endforelse
             </div>
         </div>
     </section>
@@ -1218,7 +1249,7 @@
             <div class="row g-4">
                 <div class="col-lg-3 col-md-6">
                     <div class="why-card">
-                        <div class="why-icon"><i class="bi bi-leaf"></i></div>
+                        <div class="why-icon"><i class="bi bi-droplet-fill"></i></div>
                         <div class="why-title">100% Natural</div>
                         <div class="why-desc">Ingredientes frescos y naturales sin aditivos artificiales. Tu salud es nuestra prioridad.</div>
                     </div>
@@ -1305,6 +1336,54 @@
         </div>
     </section>
 
+    <!-- ── Hours ───────────────────────────────── -->
+    <section class="hours" id="hours">
+        <div class="container">
+            <div class="text-center mb-5">
+                <div class="section-badge mx-auto"><i class="bi bi-clock-history"></i> Horarios</div>
+                <h2 class="section-title text-center">Horarios de Atención</h2>
+                <p class="section-sub mx-auto text-center">Estamos abiertos todos los días para servirte el mejor bubble tea.</p>
+            </div>
+
+            <div class="hours-card mx-auto">
+                <div class="hours-status">
+                    <span id="open-status-badge" class="status-badge is-closed">● Cerrado</span>
+                </div>
+
+                <ul class="hours-list">
+                    <li class="hours-row" data-day="1">
+                        <span class="hours-day">Lunes</span>
+                        <span class="hours-time">09:00 – 21:00</span>
+                    </li>
+                    <li class="hours-row" data-day="2">
+                        <span class="hours-day">Martes</span>
+                        <span class="hours-time">09:00 – 21:00</span>
+                    </li>
+                    <li class="hours-row" data-day="3">
+                        <span class="hours-day">Miércoles</span>
+                        <span class="hours-time">09:00 – 21:00</span>
+                    </li>
+                    <li class="hours-row" data-day="4">
+                        <span class="hours-day">Jueves</span>
+                        <span class="hours-time">09:00 – 21:00</span>
+                    </li>
+                    <li class="hours-row" data-day="5">
+                        <span class="hours-day">Viernes</span>
+                        <span class="hours-time">09:00 – 21:00</span>
+                    </li>
+                    <li class="hours-row" data-day="6">
+                        <span class="hours-day">Sábado</span>
+                        <span class="hours-time">09:00 – 21:00</span>
+                    </li>
+                    <li class="hours-row" data-day="0">
+                        <span class="hours-day">Domingo</span>
+                        <span class="hours-time">09:00 – 21:00</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
     <!-- ── Location ───────────────────────────── -->
     <section class="location" id="location">
         <div class="container">
@@ -1317,9 +1396,14 @@
                 <div class="row g-0">
                     <div class="col-lg-6">
                         <div class="location-map">
-                            <div class="map-pin">
-                                <i class="bi bi-geo-alt-fill"></i>
-                            </div>
+                            <iframe
+                                src="https://maps.google.com/maps?q=Av.%2020%20de%20Octubre%202038,%20La%20Paz,%20Bolivia&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                                width="100%" height="100%"
+                                style="border:0;"
+                                allowfullscreen=""
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"
+                                title="Ubicación de Panda Naicha"></iframe>
                         </div>
                     </div>
                     <div class="col-lg-6">
@@ -1330,43 +1414,45 @@
                                 <div class="info-icon"><i class="bi bi-geo-alt-fill"></i></div>
                                 <div>
                                     <div class="info-label">Dirección</div>
-                                    <div class="info-val">Av. Principal #123, La Paz, Bolivia</div>
+                                    <div class="info-val">Av. 20 de Octubre 2038, La Paz, Bolivia</div>
                                 </div>
                             </div>
                             <div class="info-item">
                                 <div class="info-icon"><i class="bi bi-clock-fill"></i></div>
                                 <div>
                                     <div class="info-label">Horario</div>
-                                    <div class="info-val">Lun – Sáb: 10:00 am – 9:00 pm</div>
-                                    <div class="info-val">Domingo: 11:00 am – 8:00 pm</div>
+                                    <div class="info-val">Lunes a Domingo: 09:00 – 21:00</div>
                                 </div>
                             </div>
                             <div class="info-item">
                                 <div class="info-icon"><i class="bi bi-telephone-fill"></i></div>
                                 <div>
                                     <div class="info-label">Teléfono / WhatsApp</div>
-                                    <div class="info-val">+591 7XXXXXXX</div>
+                                    <div class="info-val">+591 72088603</div>
                                 </div>
                             </div>
                             <div class="info-item">
                                 <div class="info-icon"><i class="bi bi-envelope-fill"></i></div>
                                 <div>
                                     <div class="info-label">Correo</div>
-                                    <div class="info-val">hola@pandanaicha.bo</div>
+                                    <div class="info-val">pandanaichalapaz@gmail.com</div>
                                 </div>
                             </div>
 
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=Av.+20+de+Octubre+2038,+La+Paz,+Bolivia"
+                               target="_blank" rel="noopener"
+                               class="btn-directions">
+                                <i class="bi bi-signpost-2-fill"></i> Cómo llegar
+                            </a>
+
                             <div class="mt-3" style="display:flex;gap:.6rem;">
-                                <a href="#" class="social-btn" style="background:rgba(29,106,150,.1);border-color:rgba(29,106,150,.2);color:var(--ocean);">
+                                <a href="https://www.instagram.com/pandanaicha/" target="_blank" rel="noopener" class="social-btn" style="background:rgba(29,106,150,.1);border-color:rgba(29,106,150,.2);color:var(--ocean);" aria-label="Instagram">
                                     <i class="bi bi-instagram"></i>
                                 </a>
-                                <a href="#" class="social-btn" style="background:rgba(29,106,150,.1);border-color:rgba(29,106,150,.2);color:var(--ocean);">
+                                <a href="https://www.facebook.com/Panda.Naicha.LP/directory_contact_info" target="_blank" rel="noopener" class="social-btn" style="background:rgba(29,106,150,.1);border-color:rgba(29,106,150,.2);color:var(--ocean);" aria-label="Facebook">
                                     <i class="bi bi-facebook"></i>
                                 </a>
-                                <a href="#" class="social-btn" style="background:rgba(29,106,150,.1);border-color:rgba(29,106,150,.2);color:var(--ocean);">
-                                    <i class="bi bi-whatsapp"></i>
-                                </a>
-                                <a href="#" class="social-btn" style="background:rgba(29,106,150,.1);border-color:rgba(29,106,150,.2);color:var(--ocean);">
+                                <a href="https://www.tiktok.com/@pandanaicha" target="_blank" rel="noopener" class="social-btn" style="background:rgba(29,106,150,.1);border-color:rgba(29,106,150,.2);color:var(--ocean);" aria-label="TikTok">
                                     <i class="bi bi-tiktok"></i>
                                 </a>
                             </div>
@@ -1406,10 +1492,9 @@
                         La mejor tienda de bebidas de tapioca de La Paz. Ingredientes frescos, sabores únicos y el mejor servicio.
                     </p>
                     <div class="footer-social">
-                        <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="social-btn"><i class="bi bi-whatsapp"></i></a>
-                        <a href="#" class="social-btn"><i class="bi bi-tiktok"></i></a>
+                        <a href="https://www.instagram.com/pandanaicha/" target="_blank" rel="noopener" class="social-btn" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="https://www.facebook.com/Panda.Naicha.LP/directory_contact_info" target="_blank" rel="noopener" class="social-btn" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="https://www.tiktok.com/@pandanaicha" target="_blank" rel="noopener" class="social-btn" aria-label="TikTok"><i class="bi bi-tiktok"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6 offset-lg-1">
@@ -1429,10 +1514,10 @@
                 <div class="col-lg-3 col-md-6">
                     <div class="footer-heading">Contacto</div>
                     <div style="font-size:.82rem;color:rgba(209,221,219,.45);line-height:2;">
-                        <div><i class="bi bi-geo-alt" style="color:var(--sky);margin-right:.4rem;"></i> Av. Principal #123, La Paz</div>
-                        <div><i class="bi bi-clock" style="color:var(--sky);margin-right:.4rem;"></i> Lun–Sáb 10am – 9pm</div>
-                        <div><i class="bi bi-telephone" style="color:var(--sky);margin-right:.4rem;"></i> +591 7XXXXXXX</div>
-                        <div><i class="bi bi-envelope" style="color:var(--sky);margin-right:.4rem;"></i> hola@pandanaicha.bo</div>
+                        <div><i class="bi bi-geo-alt" style="color:var(--sky);margin-right:.4rem;"></i> Av. 20 de Octubre 2038, La Paz</div>
+                        <div><i class="bi bi-clock" style="color:var(--sky);margin-right:.4rem;"></i> Lun – Dom 09:00 – 21:00</div>
+                        <div><i class="bi bi-telephone" style="color:var(--sky);margin-right:.4rem;"></i> +591 72088603</div>
+                        <div><i class="bi bi-envelope" style="color:var(--sky);margin-right:.4rem;"></i> pandanaichalapaz@gmail.com</div>
                     </div>
                 </div>
             </div>
@@ -1444,19 +1529,33 @@
         </div>
     </footer>
 
+    <!-- ── Floating WhatsApp button ─────────────── -->
+    <a href="https://wa.me/59172088603?text=Hola%2C%20me%20gustar%C3%ADa%20hacer%20una%20consulta%20sobre%20Panda%20Naicha"
+       target="_blank" rel="noopener"
+       class="whatsapp-float"
+       aria-label="Contactar por WhatsApp">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Filter buttons
+        // Filter buttons (Todos / Bebidas / Toppings)
         document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
+
+                const filter = this.dataset.filter || 'all';
+                document.querySelectorAll('[data-category]').forEach(card => {
+                    const matches = filter === 'all' || card.dataset.category === filter;
+                    card.style.display = matches ? '' : 'none';
+                });
             });
         });
 
         // Smooth scroll offset for sticky navbar
         document.querySelectorAll('a[href^="#"]').forEach(a => {
-            a.addEventListener('click', function(e) {
+            a.addEventListener('click', function (e) {
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
                     e.preventDefault();
@@ -1466,17 +1565,29 @@
             });
         });
 
-        // Add to cart button effect
-        document.querySelectorAll('.btn-add').forEach(btn => {
-            btn.addEventListener('click', function() {
-                this.innerHTML = '<i class="bi bi-check-lg"></i>';
-                this.style.background = 'var(--deep)';
-                setTimeout(() => {
-                    this.innerHTML = '<i class="bi bi-plus-lg"></i>';
-                    this.style.background = '';
-                }, 1200);
+        // Open / closed badge + highlight current day (HU-24)
+        function updateOpenStatus() {
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const openMinutes  = 9 * 60;   // 09:00
+            const closeMinutes = 21 * 60;  // 21:00
+            const isOpen = currentMinutes >= openMinutes && currentMinutes < closeMinutes;
+
+            const badge = document.getElementById('open-status-badge');
+            if (badge) {
+                badge.textContent = isOpen ? '● Abierto ahora' : '● Cerrado';
+                badge.classList.toggle('is-open',   isOpen);
+                badge.classList.toggle('is-closed', !isOpen);
+            }
+
+            const today = now.getDay(); // 0 = Domingo
+            document.querySelectorAll('[data-day]').forEach(el => {
+                el.classList.toggle('is-today', Number(el.dataset.day) === today);
             });
-        });
+        }
+
+        updateOpenStatus();
+        setInterval(updateOpenStatus, 60_000);
     </script>
 </body>
 </html>
