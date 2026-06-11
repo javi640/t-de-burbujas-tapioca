@@ -14,9 +14,14 @@ class AdminReportController extends Controller
 
     public function dailyReport(Request $request): View
     {
-        $date = $request->filled('fecha')
-            ? \Carbon\Carbon::parse($request->fecha)->startOfDay()
-            : today();
+        $date = today();
+        if ($request->filled('fecha')) {
+            try {
+                $date = \Carbon\Carbon::parse($request->fecha)->startOfDay();
+            } catch (\Exception $e) {
+                $date = today();
+            }
+        }
 
         $mode = $request->get('modo', 'cierre'); // 'cierre' o 'stock'
 

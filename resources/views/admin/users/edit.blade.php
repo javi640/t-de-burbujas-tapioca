@@ -54,6 +54,8 @@
                         value="{{ old('name', $user->name) }}"
                         required
                         maxlength="100"
+                        pattern="[A-Za-zÀ-ÿ\s]+"
+                        title="Solo letras y espacios"
                     >
                     @error('name')
                         <div class="form-error">✕ {{ $message }}</div>
@@ -185,7 +187,7 @@ const emailInput     = document.getElementById('emailInput');
 const emailIndicator = document.getElementById('emailIndicator');
 
 function validateEmail(value) {
-    const isGmail = /^[^\s@]+@gmail\.com$/i.test(value.trim());
+    const isGmail = /^(?=[^@]*[a-zA-Z])[^\s@]+@gmail\.com$/i.test(value.trim());
     emailIndicator.style.display = value ? 'block' : 'none';
     if (isGmail) {
         emailIndicator.textContent = '✓';
@@ -231,11 +233,20 @@ passwordInput.addEventListener('input', checkMatch);
 
 // ── Validación antes de enviar ───────────────────────────────
 document.getElementById('editUserForm').addEventListener('submit', function (e) {
+    const nameInput = document.querySelector('[name="name"]');
+    const nameVal = nameInput.value.trim();
+    if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nameVal)) {
+        e.preventDefault();
+        nameInput.focus();
+        alert('❌ El nombre solo puede contener letras y espacios');
+        return;
+    }
+
     const emailVal = emailInput.value.trim();
-    if (!/^[^\s@]+@gmail\.com$/i.test(emailVal)) {
+    if (!/^(?=[^@]*[a-zA-Z])[^\s@]+@gmail\.com$/i.test(emailVal)) {
         e.preventDefault();
         emailInput.focus();
-        alert('❌ El correo debe ser una cuenta de Gmail (@gmail.com)');
+        alert('❌ El correo debe ser @gmail.com y contener letras (no solo números)');
         return;
     }
 

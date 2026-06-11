@@ -44,6 +44,37 @@
                 <div class="card-header">
                     <div>
                         <div class="card-title">
+                            <i class="bi bi-person" style="vertical-align:middle;margin-right:5px;"></i>
+                            Cajero
+                        </div>
+                        <div class="card-subtitle">Selecciona quién atenderá este turno</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Cajero asignado</label>
+                    <select name="cajero_id" id="cajero_id" required>
+                        <option value="">— Seleccionar cajero —</option>
+                        @foreach($cajeros as $cajero)
+                            <option
+                                value="{{ $cajero->id }}"
+                                {{ old('cajero_id') == $cajero->id ? 'selected' : '' }}
+                                {{ in_array($cajero->id, $cajerosConTurnoAbierto) ? 'disabled' : '' }}
+                            >
+                                {{ $cajero->name }}{{ in_array($cajero->id, $cajerosConTurnoAbierto) ? ' (turno abierto)' : '' }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('cajero_id')
+                        <div class="form-error"><i class="bi bi-x-circle-fill"></i> {{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">
                             <i class="bi bi-clock" style="vertical-align:middle;margin-right:5px;"></i>
                             Horario del Turno
                         </div>
@@ -91,10 +122,13 @@
 
                 <div style="background: rgba(42,53,72,.4); border-radius: 8px; padding: .75rem 1rem; margin-top: .5rem;">
                     <div class="flex items-center gap-3">
-                        <span style="display:inline-flex;align-items:center;"><i class="bi bi-cash-stack" style="vertical-align:middle;margin-right:5px;"></i>
-                            Efectivo en Caja
+                        <span style="display:inline-flex;align-items:center;">
+                            <i class="bi bi-cash-stack"></i>
+                        </span>
+                        <div>
+                            <div class="card-title" style="margin:0;">Efectivo en Caja</div>
+                            <div class="card-subtitle">Monto físico con el que inicia el turno</div>
                         </div>
-                        <div class="card-subtitle">Monto físico con el que inicia el turno</div>
                     </div>
                 </div>
 
@@ -220,6 +254,10 @@
     const deadlinePreview = document.getElementById('deadlinePreview');
 
     function updateDeadline() {
+        if (!deadlinePreview) {
+            return;
+        }
+
         const timeVal  = scheduledInput.value;
         const tolVal   = parseInt(toleranceInput.value) || 0;
 
@@ -236,8 +274,10 @@
         deadlinePreview.textContent = `${dh}:${dm}`;
     }
 
-    scheduledInput.addEventListener('input', updateDeadline);
-    toleranceInput.addEventListener('input', updateDeadline);
-    updateDeadline();
+    if (deadlinePreview) {
+        scheduledInput.addEventListener('input', updateDeadline);
+        toleranceInput.addEventListener('input', updateDeadline);
+        updateDeadline();
+    }
 </script>
 @endsection

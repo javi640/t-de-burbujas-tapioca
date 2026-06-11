@@ -51,6 +51,8 @@
                     placeholder="Ej: Juan Pérez"
                     required
                     maxlength="100"
+                    pattern="[A-Za-zÀ-ÿ\s]+"
+                    title="Solo letras y espacios"
                 >
 
                 @error('name')
@@ -295,7 +297,7 @@ emailInput.addEventListener('input', function () {
         return;
     }
 
-    const isGmail = /^[^\s@]+@gmail\.com$/i.test(value);
+    const isGmail = /^(?=[^@]*[a-zA-Z])[^\s@]+@gmail\.com$/i.test(value);
 
     emailIndicator.style.display = 'block';
 
@@ -397,8 +399,22 @@ function togglePassword(id) {
 document
     .getElementById('createUserForm')
     .addEventListener('submit', function (e) {
+        const nameInput = document.querySelector('[name="name"]');
+        const nameVal = nameInput.value.trim();
+
+        if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nameVal)) {
+            e.preventDefault();
+            nameInput.focus();
+            nameInput.style.borderColor = 'var(--danger)';
+
+            alert(
+                '❌ El nombre solo puede contener letras y espacios'
+            );
+            return;
+        }
+
         const emailVal = emailInput.value.trim();
-        const isGmail = /^[^\s@]+@gmail\.com$/i.test(emailVal);
+        const isGmail = /^(?=[^@]*[a-zA-Z])[^\s@]+@gmail\.com$/i.test(emailVal);
 
         if (!isGmail) {
             e.preventDefault();
@@ -406,7 +422,7 @@ document
             emailInput.style.borderColor = 'var(--danger)';
 
             alert(
-                '❌ El correo debe ser una cuenta de Gmail (@gmail.com)'
+                '❌ El correo debe ser @gmail.com y contener letras (no solo números)'
             );
             return;
         }
