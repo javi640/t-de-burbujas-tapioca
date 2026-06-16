@@ -9,7 +9,7 @@
     <a href="{{ route('cajero.sales.create') }}" class="nav-item">
         <span class="nav-icon"><i class="bi bi-cart3"></i></span> Nueva Venta
     </a>
-    <a href="javascript:void(0)" onclick="document.getElementById('movements').scrollIntoView({behavior:'smooth'})" class="nav-item">
+    <a href="{{ route('cajero.movements.index') }}" class="nav-item">
         <span class="nav-icon"><i class="bi bi-currency-dollar"></i></span> Movimientos
     </a>
 @endsection

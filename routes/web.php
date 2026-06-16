@@ -46,6 +46,7 @@ Route::middleware(['auth', 'role:cajero', 'prevent-cache'])->prefix('cajero')->n
     // Ventas y movimientos
     Route::get('/venta/nueva',           [SaleController::class, 'create'])->name('sales.create');
     Route::post('/venta',                [SaleController::class, 'store'])->name('sales.store');
+    Route::get('/movimientos',           [CashMovementController::class, 'index'])->name('movements.index');
     Route::post('/movimiento',           [CashMovementController::class, 'store'])->name('movements.store');
 });
 

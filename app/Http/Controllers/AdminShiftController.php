@@ -48,7 +48,7 @@ class AdminShiftController extends Controller
      */
     public function showOpenForCajero(): View
     {
-        $cajeros = User::whereHas('role', fn($q) => $q->where('slug', 'cajero'))
+        $cajeros = User::whereHas('role', fn ($q) => $q->where('slug', 'cajero'))
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
@@ -84,30 +84,34 @@ class AdminShiftController extends Controller
     public function openForCajero(Request $request): RedirectResponse
     {
         $request->validate([
-            'cajero_id'         => ['required', 'exists:users,id'],
-            'initial_cash'      => ['required', 'numeric', 'min:0'],
-            'scheduled_start'   => ['required', 'date_format:H:i'],
+            'cajero_id' => ['required', 'exists:users,id'],
+            'initial_cash' => ['required', 'numeric', 'min:0'],
+            'scheduled_start' => ['required', 'date_format:H:i'],
             'tolerance_minutes' => ['nullable', 'integer', 'min:0', 'max:120'],
-            'stock'             => ['required', 'array', 'min:1'],
-            'stock.*'           => ['required', 'integer', 'min:0'],
-            'notes'             => ['nullable', 'string', 'max:500'],
+            'stock' => ['required', 'array', 'min:1', function ($attribute, $value, $fail) {
+                if (array_sum($value) <= 0) {
+                    $fail('Debes ingresar stock para al menos un producto.');
+                }
+            }],
+            'stock.*' => ['required', 'integer', 'min:0'],
+            'notes' => ['nullable', 'string', 'max:500'],
         ], [
-            'cajero_id.required'       => 'Debes seleccionar un cajero.',
-            'cajero_id.exists'         => 'El cajero seleccionado no existe.',
-            'initial_cash.required'    => 'El efectivo inicial es obligatorio.',
-            'initial_cash.min'         => 'El efectivo inicial no puede ser negativo.',
+            'cajero_id.required' => 'Debes seleccionar un cajero.',
+            'cajero_id.exists' => 'El cajero seleccionado no existe.',
+            'initial_cash.required' => 'El efectivo inicial es obligatorio.',
+            'initial_cash.min' => 'El efectivo inicial no puede ser negativo.',
             'scheduled_start.required' => 'La hora programada es obligatoria.',
             'scheduled_start.date_format' => 'El formato de hora debe ser HH:MM.',
-            'stock.required'           => 'Debes ingresar el stock inicial.',
+            'stock.required' => 'Debes ingresar el stock inicial.',
         ]);
 
-        $admin  = $this->authUser();
+        $admin = $this->authUser();
         $cajero = User::findOrFail($request->cajero_id);
 
         // Verificar que el cajero no tenga ya un turno abierto
         if ($cajero->hasOpenShift()) {
             return back()->withErrors([
-                'cajero_id' => "El cajero {$cajero->name} ya tiene un turno abierto."
+                'cajero_id' => "El cajero {$cajero->name} ya tiene un turno abierto.",
             ]);
         }
 
@@ -116,39 +120,39 @@ class AdminShiftController extends Controller
 
         DB::transaction(function () use ($request, $admin, $cajero, $scheduledStart) {
             $shift = Shift::create([
-                'user_id'           => $cajero->id,
-                'opened_by'         => $admin->id,
-                'status'            => 'OPEN',
-                'start_time'        => now(),        // momento real de apertura
-                'scheduled_start'   => $scheduledStart,
+                'user_id' => $cajero->id,
+                'opened_by' => $admin->id,
+                'status' => 'OPEN',
+                'start_time' => now(),        // momento real de apertura
+                'scheduled_start' => $scheduledStart,
                 'tolerance_minutes' => $request->tolerance_minutes ?? 0,
                 'attendance_status' => 'PENDIENTE',  // el cajero aún no ha ingresado
-                'initial_cash'      => $request->initial_cash,
-                'notes'             => $request->notes,
+                'initial_cash' => $request->initial_cash,
+                'notes' => $request->notes,
             ]);
 
             // Registrar stock inicial
             foreach ($request->stock as $productId => $quantity) {
                 if ($quantity > 0) {
                     ShiftStock::create([
-                        'shift_id'         => $shift->id,
-                        'product_id'       => $productId,
+                        'shift_id' => $shift->id,
+                        'product_id' => $productId,
                         'initial_quantity' => $quantity,
-                        'sold_quantity'    => 0,
+                        'sold_quantity' => 0,
                     ]);
                 }
             }
 
             AuditLog::create([
-                'user_id'    => $admin->id,
-                'action'     => 'open_shift_for_cajero',
-                'model'      => 'Shift',
-                'model_id'   => $shift->id,
+                'user_id' => $admin->id,
+                'action' => 'open_shift_for_cajero',
+                'model' => 'Shift',
+                'model_id' => $shift->id,
                 'new_values' => [
-                    'cajero_id'         => $cajero->id,
-                    'cajero_name'       => $cajero->name,
-                    'initial_cash'      => $request->initial_cash,
-                    'scheduled_start'   => $scheduledStart->format('H:i'),
+                    'cajero_id' => $cajero->id,
+                    'cajero_name' => $cajero->name,
+                    'initial_cash' => $request->initial_cash,
+                    'scheduled_start' => $scheduledStart->format('H:i'),
                     'tolerance_minutes' => $request->tolerance_minutes ?? 0,
                 ],
                 'ip_address' => request()->ip(),
